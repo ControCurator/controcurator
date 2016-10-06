@@ -1,0 +1,21 @@
+body {
+      background-color: #DADADA;
+    }
+
+div.main.container {
+ margin-top: 5em;
+}
+
+.term.negative {
+	color:#CC0000;
+}
+.term.positive {
+	color:#009900;
+}
+.term.neutral {
+	color:#FF9900;
+}
+
+.term {
+	border-bottom: 1px solid #333333;
+}

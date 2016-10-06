@@ -1,0 +1,12 @@
+extends layout
+
+block content
+
+  - if (!results.found)
+    h2.ui.ten.wide.column 
+      | Article "<strong>#{id}</strong>" cannot be found.
+  - else
+    div.ui.segment
+      h1: a(href='/article/' + results._id) #{results._source.title}
+      div.passage
+        != results.content

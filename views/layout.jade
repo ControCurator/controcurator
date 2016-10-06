@@ -1,0 +1,27 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css')
+    script(src="//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js")
+    script(src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js")
+    script(src='/javascripts/main.js')
+
+  body
+    header.ui.fixed.inverted.menu: div.ui.container
+      a.item(href='/')= 'ControCurator'
+
+      div.ui.right.floated.right.aligned
+        form(action='/search/', method='GET')
+          div.ui.search
+            div.ui.icon.input
+              input.prompt(name='q', type='text', placeholder= 'Search')
+              i.search.icon
+
+
+    div.ui.main.text.container
+      block error
+      block content
+        h1 Layout Example
+        p If you can see this, something went terribly wrong
