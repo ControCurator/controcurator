@@ -1,0 +1,17 @@
+vaccine
+vaccination
+inoculation
+shot
+chickenpox
+disease
+hepatitis A
+hepatitis B
+infection
+measles
+outbreak
+mumps
+rabies
+tetanus
+virus
+autism
+
