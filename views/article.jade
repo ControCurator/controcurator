@@ -7,6 +7,6 @@ block content
       | Article "<strong>#{id}</strong>" cannot be found.
   - else
     div.ui.segment
-      h1: a(href='/article/' + results._id) #{results._source.title}
+      h1: a(href='/browse/article/' + results._id) #{results._source.title}
       div.passage
         != results.content

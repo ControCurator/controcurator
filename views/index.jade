@@ -8,18 +8,18 @@ block content
             h2.ui.teal.header
                 .content Controversial Topics
             - each link in results.neutral
-                a(href='/search/'+link._source.text, class='term neutral', style='display:block;') #{link._source.text}
+                a(href='/browse/search/'+link._source.text, class='term neutral', style='display:block;') #{link._source.text}
 
     .five.wide.column
         .ui.stacked.segment
             h2.ui.teal.header
                 .content Positive Topics
             - each link in results.positive
-                a(href='/search/'+link._source.text, class='term positive', style='display:block;') #{link._source.text}
+                a(href='/browse/search/'+link._source.text, class='term positive', style='display:block;') #{link._source.text}
 
     .five.wide.column
         .ui.stacked.segment
             h2.ui.teal.header
                 .content Negative Topics
             - each link in results.negative
-                a(href='/search/'+link._source.text, class='term negative', style='display:block;') #{link._source.text}
+                a(href='/browse/search/'+link._source.text, class='term negative', style='display:block;') #{link._source.text}

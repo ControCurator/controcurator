@@ -26,7 +26,7 @@ function loadSearch() {
 }
 
 router.get('/', loadSearch(), function(req, res, next) {
-    res.render('search', { 'title':'ControCurator', q: req.params.id, results: req.searchResults, summarize});
+    res.render('search', { 'title':'ControCurator', q: req.params.id, results: req.searchResults});
 });
 
 module.exports = router;
