@@ -2,6 +2,9 @@ var express = require('express');
 _ = require('underscore')._
 var request = require('request');
 var router = express.Router();
+var exec = require('child_process').exec;
+var path = require('path');
+var parentDir = path.resolve(process.cwd());
 
 //var search = require('../controllers/search');
 
@@ -15,77 +18,21 @@ var summarize = function(str) {
 function loadSearch() {
     return function(req, res, next) {
 
-        req.positive = [];
-        req.negative = [];
-        req.neutral = [];
-
-        var url = 'http://controcurator.org/ess/vaccination/topic/_search';
-        var query = {
-            "query" : {
-                "constant_score" : { 
-                    "filter" : {
-                        "term" : { 
-                            "sentiment" : "positive"
-                        }
-                    }
-                }
-            }
-        };
-
-         request({ uri: url, json: true, body: query }, function(err, resp, data) {
-            if (err) {
+  
+        var child = exec('python '+parentDir+'/python_code/endpoints.py controversial', function(err, stdout, stderr) {
+            if (err) console.log(err);
+            else {
+                req.data = JSON.parse(stdout);
+                console.log(req.data.controversial);
                 next();
-            }// return res.sendStatus(500);
-            req.positive = data.hits.hits;
-            //next();
+            }
         });
 
-        var url = 'http://controcurator.org/ess/vaccination/topic/_search';
-        var query = {
-            "query" : {
-                "constant_score" : { 
-                    "filter" : {
-                        "term" : { 
-                            "sentiment" : "negative"
-                        }
-                    }
-                }
-            }
-        };
-
-        request({ uri: url, json: true, body: query }, function(err, resp, data) {
-            if (err) {
-                next();
-            }// return res.sendStatus(500);
-            req.negative = data.hits.hits;
-            //next();
-        });
-
-        var url = 'http://controcurator.org/ess/vaccination/topic/_search';
-        var query = {
-            "query" : {
-                "constant_score" : { 
-                    "filter" : {
-                        "term" : { 
-                            "sentiment" : "neutral"
-                        }
-                    }
-                }
-            }
-        };
-
-        request({ uri: url, json: true, body: query }, function(err, resp, data) {
-            if (err) {
-                next();
-            }// return res.sendStatus(500);
-            req.neutral = data.hits.hits;
-            next();
-        });
     };
 }
 
 router.get('/', loadSearch(), function(req, res, next) {
-    res.render('index', { 'title':'ControCurator', q: req.query.q, results: req});
+    res.render('index', { 'title':'ControCurator', q: req.query.q, results: req.data});
 });
 
 module.exports = router;

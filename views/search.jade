@@ -14,4 +14,4 @@ block content
         h2.ui.header: a(href='/browse/article/' + link._id) #{link._source.title}
         div: a(href=''+link._source.url) #{link._source.url}
         p
-          != summarize(link._source.text)
+          //!= summarize(link._source.text)

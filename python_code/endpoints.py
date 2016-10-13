@@ -73,7 +73,7 @@ if not 'fake_data.json' in os.listdir('.'):
 	#		'labour unions','factory work','Canada','Tourism', 'Flights','pollution'
 	#		'management','NASA','Pluto (planet)']
 	####
-	nounphrases = [item['_source']['text'] for item in json.load(open('es_1000_dump.json'))]
+	nounphrases = [item['_source']['text'] for item in json.load(open(os.getcwd()+'/python_code/es_1000_dump.json'))]
 	fake_data = [{x:{'score':random.betavariate(1,1),'confidence':random.betavariate(1,1)}} for x in nounphrases]
 	json.dump(fake_data, open('fake_data.json','w'))
 else:

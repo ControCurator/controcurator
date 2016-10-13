@@ -1,25 +1,24 @@
 extends layout
 
 block content
-  .ui.middle.aligned.center.aligned.grid
-
-    .five.wide.column
+  .ui.middle.aligned.center.aligned
         .ui.stacked.segment
             h2.ui.teal.header
-                .content Controversial Topics
-            - each link in results.neutral
-                a(href='/browse/search/'+link._source.text, class='term neutral', style='display:block;') #{link._source.text}
+                .content Controversial Issues
+            - each link,i in results.controversial
+                - each val,key in link
+                    div(style='display:block;')
+                        a(href='/browse/search/'+key, class='term neutral') #{key}
+                        div(style='float:right') #{val.score}
 
-    .five.wide.column
-        .ui.stacked.segment
-            h2.ui.teal.header
-                .content Positive Topics
-            - each link in results.positive
-                a(href='/browse/search/'+link._source.text, class='term positive', style='display:block;') #{link._source.text}
 
-    .five.wide.column
-        .ui.stacked.segment
+         .ui.stacked.segment
             h2.ui.teal.header
-                .content Negative Topics
-            - each link in results.negative
-                a(href='/browse/search/'+link._source.text, class='term negative', style='display:block;') #{link._source.text}
+                .content Non-Controversial Issues
+            - each link,i in results.noncontroversial
+                - each val,key in link
+                    div(style='display:block;')
+                        a(href='/browse/search/'+key, class='term positive') #{key}
+                        div(style='float:right') #{val.score}
+
+
