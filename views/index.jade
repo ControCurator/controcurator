@@ -11,8 +11,10 @@ block content
                         a(href='/browse/search/'+key, class='term neutral') #{key}
                         div(style='float:right') #{val.score}
 
+        include annotation
 
-         .ui.stacked.segment
+
+        .ui.stacked.segment
             h2.ui.teal.header
                 .content Non-Controversial Issues
             - each link,i in results.noncontroversial
