@@ -197,12 +197,12 @@ class GuardianScraper:
 		for url in open(urlFile).read().splitlines():
 					
 				if (resume and url not in scraped) or (not resume):
-					log.write(url+'\n')
 					print "Scraping, currently at {}".format(url)
 					page,id = self.retrieveArticle(url,collect_comments=collect_comments)
 					article_path = os.path.join(repository,'{}.json'.format(id))
 					with open(article_path, 'w') as out:
 						json.dump(page, out)
+						log.write(url+'\n')
 						time.sleep(1)
 				else:
 					print 'Already scraped %s. Continue.'%url
