@@ -12,7 +12,7 @@ from pprint import pprint
 MAXTRIES = 5
 
 ARTICLES = 'http://q.crowdynews.com/v1/articles/controcurator'
-SOCMEDS   = 'http://q.crowdynews.com/v1/collections/controcurator'
+SOCMEDS   = 'https://q.crowdynews.com/v1/content/controcurator?q=BOxE9ZZ-vaccination'
 
 BASE = 'http://q.crowdynews.com'
 
@@ -31,7 +31,7 @@ SOCMED   = 0
 SOCCHILD = 0
 FAILURES = []
 
-now = lambda: datetime.datetime.now().isoformat()
+now = lambda: datetime.datetime.utcnow().isoformat()
 islist = lambda x: type(x)==list
 isdict = lambda x: type(x)==dict
 
@@ -55,30 +55,35 @@ def get_articles(tries = MAXTRIES):
 		if(res['created'] == True):
 			global ARTCOUNTNEW
 			ARTCOUNTNEW += 1
-			print('Added article '+article['type']+' '+res['_id'])
+			print('Added '+article['type']+' '+res['_id'])
 		else:
-			print('Existing article '+article['type']+' '+res['_id'])
+			print('Existing '+article['type']+' '+res['_id'])
 		get_article_children(article)
 
 def get_article_children(article, tries = MAXTRIES):
 	children = requests.get(BASE+article['url']).json()
-	if (isdict(children) and children.get('status','noerror')=='error') or len(children) == 0:
-		print('retrying article children because of {}'.format(children))
+	if (len(children) == 0):
+		return
+	if (isdict(children) and children.get('status','noerror')=='error'):
+		#print('retrying article children because of {}'.format(children))
 		#time.sleep(1)
-		if tries > 0 : get_article_children(article, tries=tries-1)
-		else:
-			global FAILURES
-			FAILURES.append('article_children')
+		#if tries > 0 : get_article_children(article, tries=tries-1)
+		#else:
+		global FAILURES
+		FAILURES.append('article_children')
 		return
 
 
 	bulk_data = [] 
-
-
+	artChildren = 0
+	time = now()
 	for child in children:
 	    data_dict = {}
 	    for i in child:
-	        data_dict[i] = child[i]
+			artChildren += 1
+			data_dict[i] = child[i]
+	    data_dict['parent'] = article
+	    data_dict['retrieved'] = time
 
 	    op_dict = {
 	        "create": {
@@ -94,20 +99,19 @@ def get_article_children(article, tries = MAXTRIES):
 	res = client.bulk(index = INDEX, body = bulk_data)
 	#pprint(res)
 	# see how many succeeded
-	artChildren = 0
+
 	artChildrenNew = 0
 	for r in res['items']:
-		artChildren += 1
 		#print r['create']['error']
 		if(r['create']['status'] != 409):
 			artChildrenNew += 1
-			print('Added new child')
+			#print('Added new child '+r['create']['_type'])
 
 	global ARTCHILD
 	ARTCHILD += artChildren
 	global ARTCHILDNEW
 	ARTCHILDNEW += artChildrenNew
-	print('Ignored children: '+str(artChildren-artChildrenNew))
+	#print('Ignored children: '+str(artChildren-artChildrenNew))
 
 
 
@@ -122,7 +126,12 @@ def get_socmed(tries = MAXTRIES):
 			FAILURES.append('socmed')
 		return
 	for socmed in socmeds:
-		get_socchild(socmed)
+		global SOCCHILD
+		SOCCHILD +=1
+		socmed['retrieved'] = now()
+		res = client.index(INDEX, id=socmed.get('id',None), doc_type=socmed.get('service','unknown'),body=socmed)
+		print('retrieved '+socmed.get('service','unknown')+' status: '+str(res['created'])+' id: '+socmed.get('id',None))
+		#get_socchild(socmed)
 
 def get_socchild(socmed, tries = MAXTRIES):
 	global SOCMED
@@ -153,8 +162,8 @@ if __name__=='__main__':
 	print('started at {}'.format(start))
 	print('retieving articles at {}'.format(now()))
 	get_articles()
-	#print('retrieving social media at {}'.format(now()))
-	#get_socmed()
+	print('retrieving social media at {}'.format(now()))
+	get_socmed()
 	print('finished at {}'.format(now()))
 	log = dict(
 		starttime = start,
@@ -168,4 +177,4 @@ if __name__=='__main__':
 		errors = dict(Counter(FAILURES))
 	)
 	pprint(log)
-	client.index(LOGDEX, doc_type='retrieval_log', body=log)
+	client.create(LOGDEX, doc_type='retrieval_log', body=log)
