@@ -23,7 +23,7 @@ function loadSearch() {
             if (err) console.log(err);
             else {
                 req.data = JSON.parse(stdout);
-                console.log(req.data.controversial);
+                //console.log(req.data.controversial);
                 next();
             }
         });

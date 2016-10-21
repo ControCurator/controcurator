@@ -57,7 +57,12 @@ import random # while real data lacks
 import json
 import sys
 import os
-#from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch
+from pprint import pprint
+
+es = Elasticsearch(
+    ['http://controcurator.org/ess/'],
+    port=80)
 
 ELASTIC_CREDENTIALS = '#elastic.json'
 ELASTIC_INDEX       = ''
@@ -66,13 +71,8 @@ ELASTIC_INDEX       = ''
 
 ### Placeholder functions 
 if not 'fake_data.json' in os.listdir('.'):
-	### NO LONGER USE MADE-UP NOUNPHRASES, MOVED TO ACTUAL ES-DUMP TOP 1000 NOUNPHRASES ###
-	#nounphrases = ['vaccine', 'research', 'autism', 'flu shots', 'stuff','other stuff', 'trump' , 'projects', 
-	#		 'shopping','Nationale Spoorwegen (NS)', 'government','big pharma','Bill Gates','Steve Jobs',
-	#		'hard work','herd immunity','daily planet', 'NSA','liberty','USA' , 'animal shelters', 
-	#		'labour unions','factory work','Canada','Tourism', 'Flights','pollution'
-	#		'management','NASA','Pluto (planet)']
-	####
+
+
 	nounphrases = [item['_source']['text'] for item in json.load(open(os.getcwd()+'/python_code/es_1000_dump.json'))]
 	fake_data = [{x:{'score':random.betavariate(1,1),'confidence':random.betavariate(1,1)}} for x in nounphrases]
 	json.dump(fake_data, open('fake_data.json','w'))
@@ -97,10 +97,136 @@ def controversial(method='GET'):
 		noncontroversial : estimates
 	}
 	'''
-	datapoints       = sorted(fake_data, key=lambda x : list(x.values())[0].get('score',0))
-	controversial    = datapoints[:10]
-	noncontroversial = datapoints[10:]
-	results = {'controversial':controversial, 'noncontroversial':noncontroversial}
+
+	# get top 10 topics
+	topQuery = {"query": {
+	    "filtered": {
+	      "query": {
+	        "query_string": {
+	          "analyze_wildcard": True,
+	          "query": "*"
+	        }
+	      },
+	      "filter": {
+	        "bool": {
+	          "must": [
+	            {
+	              "range": {
+	                "count": {
+	                  "gt": 20,
+	                }
+	              }
+	            }
+	          ],
+	          "must_not": []
+	        }
+	      }
+	    }
+	  },
+	  "size": 0,
+	  "aggs": {
+	    "topics": {
+	      "terms": {
+	        "field": "topic",
+	        "size": 20,
+	        "order": {
+	          "cont": "desc"
+	        }
+	      },
+	      "aggs": {
+	        "cont": {
+	          "avg": {
+	            "field": "controversy"
+	          }
+	        },
+	        "pos": {
+	          "sum": {
+	            "field": "positive"
+	          }
+	        },
+	        "neg": {
+	          "sum": {
+	            "field": "negative"
+	          }
+	        },
+	        "count": {
+	          "sum": {
+	            "field": "count"
+	          }
+	        }
+	      }
+	    }
+	  }
+	}
+
+	# get top 10 topics
+	bottomQuery = {"query": {
+	    "filtered": {
+	      "query": {
+	        "query_string": {
+	          "analyze_wildcard": True,
+	          "query": "*"
+	        }
+	      },
+	      "filter": {
+	        "bool": {
+	          "must": [
+	            {
+	              "range": {
+	                "count": {
+	                  "gte": 10,
+	                }
+	              }
+	            }
+	          ],
+	          "must_not": []
+	        }
+	      }
+	    }
+	  },
+	  "size": 0,
+	  "aggs": {
+	    "topics": {
+	      "terms": {
+	        "field": "topic",
+	        "size": 10,
+	        "order": {
+	          "cont": "asc"
+	        }
+	      },
+	      "aggs": {
+	        "cont": {
+	          "avg": {
+	            "field": "controversy"
+	          }
+	        },
+	        "pos": {
+	          "sum": {
+	            "field": "positive"
+	          }
+	        },
+	        "neg": {
+	          "sum": {
+	            "field": "negative"
+	          }
+	        },
+	        "count": {
+	          "sum": {
+	            "field": "count"
+	          }
+	        }
+	      }
+	    }
+	  }
+	}
+
+	top = es.search(index="topics", doc_type="vaccination", body=topQuery)
+	topTopics = top['aggregations']['topics']['buckets']
+
+	bottom = es.search(index="topics", doc_type="vaccination", body=bottomQuery)
+	bottomTopics = bottom['aggregations']['topics']['buckets']
+
+	results = {'controversial':topTopics, 'noncontroversial':bottomTopics}
 	return json.dumps(results)
 
 
@@ -148,13 +274,13 @@ if __name__=='__main__':
 	if len(sys.argv)==1:
 		print(json.dumps({"ERROR":"NO ENDPOINT SPECIFIED"}))
 	if len(sys.argv)==2:
-		try:
-			if sys.argv[1]   == 'controversial': print(controversial())
-			elif sys.argv[1] == 'unsure': print(unsure())
-			else: print(json.dumps({"404":"Unknown endpoint"}))
+		#try:
+		if sys.argv[1]   == 'controversial': print(controversial())
+		elif sys.argv[1] == 'unsure': print(unsure())
+		else: print(json.dumps({"404":"Unknown endpoint"}))
 			
-		except:
-			print( json.dumps({'502':'stuff died'}))
+		#except:
+		#	print( json.dumps({'502':'stuff died'}))
 	if len(sys.argv)==3:
 		try:
 			print(unsure(method='PUT', data=sys.argv[2]))
