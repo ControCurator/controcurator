@@ -71,8 +71,6 @@ ELASTIC_INDEX       = ''
 
 ### Placeholder functions 
 if not 'fake_data.json' in os.listdir('.'):
-
-
 	nounphrases = [item['_source']['text'] for item in json.load(open(os.getcwd()+'/python_code/es_1000_dump.json'))]
 	fake_data = [{x:{'score':random.betavariate(1,1),'confidence':random.betavariate(1,1)}} for x in nounphrases]
 	json.dump(fake_data, open('fake_data.json','w'))
@@ -246,9 +244,69 @@ def unsure(method='GET', data='[]'):
 		noncontroversial : estimates
 	}
 	'''
-	if method == 'GET':
-		datapoints       = sorted(fake_data, key=lambda x : list(x.values())[0].get('confidence',0))
-		unsure  = datapoints[0]
+	if method == 'GET':	
+		# get top 10 topics
+		bottomQuery = {"query": {
+		    "filtered": {
+		      "query": {
+		        "query_string": {
+		          "analyze_wildcard": True,
+		          "query": "*"
+		        }
+		      },
+		      "filter": {
+		        "bool": {
+		          "must": [
+		            {
+		              "range": {
+		                "count": {
+		                  "gte": 5,
+		                }
+		              }
+		            }
+		          ],
+		          "must_not": []
+		        }
+		      }
+		    }
+		  },
+		  "size": 0,
+		  "aggs": {
+		    "topics": {
+		      "terms": {
+		        "field": "topic",
+		        "size": 1,
+		        "order": {
+		          "cont": "asc"
+		        }
+		      },
+		      "aggs": {
+		        "cont": {
+		          "avg": {
+		            "field": "controversy"
+		          }
+		        },
+		        "pos": {
+		          "sum": {
+		            "field": "positive"
+		          }
+		        },
+		        "neg": {
+		          "sum": {
+		            "field": "negative"
+		          }
+		        },
+		        "count": {
+		          "sum": {
+		            "field": "count"
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		bottom = es.search(index="topics", doc_type="vaccination", body=bottomQuery)
+		unsure = bottom['aggregations']['topics']['buckets']
 		results = { 'unsure' : unsure }
 		return json.dumps(results)
 	else:
