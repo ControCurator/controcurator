@@ -11,8 +11,8 @@ from pprint import pprint
 
 MAXTRIES = 5
 
-ARTICLES = 'http://q.crowdynews.com/v1/articles/controcurator'
-SOCMEDS   = 'https://q.crowdynews.com/v1/content/controcurator?q=BOxE9ZZ-vaccination'
+ARTICLES = 'http://q.crowdynews.com/v1/articles/controcurator?count=100'
+SOCMEDS   = 'https://q.crowdynews.com/v1/content/controcurator?q=BOxE9ZZ-vaccination&count=100'
 
 BASE = 'http://q.crowdynews.com'
 
