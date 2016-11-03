@@ -48,19 +48,21 @@ def get_articles(tries = MAXTRIES):
 	for article in articles:
 		global ARTCOUNT
 		ARTCOUNT += 1
-		article['type']='article'
+		article['service'] = 'article'
 		article_id = hash(article['url'])
 		article['retrieved'] =	now()
-		res = client.index('crowdynews', id=article_id, doc_type=article['type'],body=article)
+		res = client.index('crowdynews', id=article_id, doc_type=article['service'],body=article)
 		if(res['created'] == True):
 			global ARTCOUNTNEW
 			ARTCOUNTNEW += 1
-			print('Added '+article['type']+' '+res['_id'])
+			print('Added '+article['service']+' '+res['_id'])
 		else:
-			print('Existing '+article['type']+' '+res['_id'])
-		get_article_children(article)
+			print('Existing '+article['service']+' '+res['_id'])
+		print res['_id']
+		#pprint(article)
+		get_article_children(article, article_id)
 
-def get_article_children(article, tries = MAXTRIES):
+def get_article_children(article, article_id, tries = MAXTRIES):
 	children = requests.get(BASE+article['url']).json()
 	if (len(children) == 0):
 		return
@@ -82,9 +84,9 @@ def get_article_children(article, tries = MAXTRIES):
 	    for i in child:
 			artChildren += 1
 			data_dict[i] = child[i]
-	    data_dict['parent'] = article
+	    data_dict['parent'] = article_id
 	    data_dict['retrieved'] = time
-
+	    pprint(data_dict)
 	    op_dict = {
 	        "create": {
 	            "_index": INDEX, 

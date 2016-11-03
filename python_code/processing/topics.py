@@ -135,10 +135,10 @@ if __name__=='__main__':
 
 	query = {
         "query" : {
-            "constant_score" : { 
-                "filter" : {
-                    "missing" : { 
-                        "field" : "tagged"
+            "bool" : { 
+                "must_not" : {
+                    "term" : { 
+                        "tagged" : True
                     }
                 }
             }
@@ -148,13 +148,15 @@ if __name__=='__main__':
 
 	response= es.search(index="crowdynews", body=query)
 
+
 	for hit in response["hits"]["hits"]:
 		if 'text' in hit['_source']:
 			doc = hit['_source']['text']
 		elif 'title' in hit['_source']:
 			doc = hit['_source']['title']
 		else:
-			pprint(hit['_source'])
+			continue
+			#pprint(hit['_source'])
 
 		if len(doc) == 0:
 			continue
@@ -175,23 +177,43 @@ if __name__=='__main__':
 			date = hit['_source']['date']
 
 		for sentence in tagged:
+
 			sentiment = getSentiment(sentence)
 			#print sentiment
-			sentenceTopics = getTopics(sentence)
-			for t in sentenceTopics:
-				if t.lower() not in stop:
+#			sentenceTopics = getTopics(sentence)
+#			for t in sentenceTopics:
+#				if t.lower() not in stop:
+#					if t not in topics:
+#						topics[t] = {'topic':t,'type':'NOUN','date':date,'retrieved':retrieved,'parent':hit['_id'],'service':hit['_type'],'count':0,'words':0,'positive':0,'negative':0,'intensity':0,'controversy':0}
+#					topics[t]['count'] += 1
+#					topics[t]['words'] += sentiment['count']
+#					topics[t]['positive'] += sentiment['positive']
+#					topics[t]['negative'] += sentiment['negative']
+#					topics[t]['intensity'] = topics[t]['positive'] + (-1 * topics[t]['negative'])
+#					topics[t]['controversy'] = topics[t]['intensity'] / max(abs(topics[t]['positive'] - (-1 * topics[t]['negative'])),1)
+		
+			for chunk in nltk.ne_chunk(sentence):
+				if type(chunk) is nltk.Tree:
+					t = ' '.join(c[0] for c in chunk.leaves())
+					cat = chunk.label()
+#					print t,cat
 					if t not in topics:
-						topics[t] = {'topic':t,'date':date,'retrieved':retrieved,'parent':hit['_id'],'type':hit['_type'],'count':0,'words':0,'positive':0,'negative':0,'intensity':0,'controversy':0}
+						topics[t] = {'topic':t,'type':cat,'date':date,'retrieved':retrieved,'parent':hit['_id'],'service':hit['_type'],'count':0,'words':0,'positive':0,'negative':0,'intensity':0,'controversy':0}
+
+					if t in topics:
+						topics[t]['type'] = cat
 					topics[t]['count'] += 1
 					topics[t]['words'] += sentiment['count']
 					topics[t]['positive'] += sentiment['positive']
 					topics[t]['negative'] += sentiment['negative']
 					topics[t]['intensity'] = topics[t]['positive'] + (-1 * topics[t]['negative'])
 					topics[t]['controversy'] = topics[t]['intensity'] / max(abs(topics[t]['positive'] - (-1 * topics[t]['negative'])),1)
-		
+
 
 		if topics:
+#			for t in topics:
+				#print t+' - '+topics[t]['type']
 			addBulk(topics)
-		es.index(index = hit['_index'], doc_type=hit['_type'], id=hit['_id'], body = {'tagged':True})
+		es.update(index = hit['_index'], doc_type=hit['_type'], id=hit['_id'], body = {'doc':{'tagged' : True}})
 		#break
 	#pprint(topics)
