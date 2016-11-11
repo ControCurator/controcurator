@@ -5,10 +5,10 @@ block content
         .ui.stacked.segment
             h2.ui.teal.header
                 .content Controversial Issues
-            - each topic,i in results.controversial
+            - each anchor,i in results.controversial
                 div(style='display:block;')
-                    - var rounded = Math.round(topic.cont.value*100)/100
-                    a(href='/browse/search/'+i, class='term neutral') #{topic.key}
+                    - var rounded = Math.round(anchor.confidence*100)/100
+                    a(href='/browse/search/'+i, class='term neutral') #{anchor.anchor}
                     div(style='float:right') #{rounded}
 
         include annotation
@@ -17,10 +17,10 @@ block content
         .ui.stacked.segment
             h2.ui.teal.header
                 .content Non-Controversial Issues
-            - each topic,i in results.noncontroversial
+            - each anchor,i in results.noncontroversial
                 div(style='display:block;')
-                    - var rounded = Math.round(topic.cont.value*100)/100
-                    a(href='/browse/search/'+i, class='term neutral') #{topic.key}
+                    - var rounded = Math.round(anchor.confidence*100)/100
+                    a(href='/browse/search/'+i, class='term neutral') #{anchor.anchor}
                     div(style='float:right') #{rounded}
 
 

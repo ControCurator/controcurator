@@ -13,11 +13,24 @@ stop = stopwords.words('english') + list(string.punctuation)
 es = Elasticsearch(
     ['http://controcurator.org/ess/'],
     port=80)
-INDEX  = 'topics'
+INDEX  = 'anchors'
 TYPES = 'vaccination'
 LOGDEX = 'crowdylog'
 now = lambda: datetime.datetime.utcnow().isoformat()
 
+
+query = {
+    "query" : {
+        "bool" : { 
+            "must_not" : {
+                "term" : { 
+                    "tagged" : True
+                }
+            }
+        }
+    },
+	"size": 1000,
+}
 
 
 # NP patterns   
@@ -28,7 +41,7 @@ pattern = r"""
   CLAUSE: {<NP><VP>}           # Chunk NP, VP
   """ # define a tag pattern of an NP chunk
 NPChunker = nltk.RegexpParser(pattern) # create a chunk parser
-topics = []
+anchors = []
 
 
 
@@ -82,18 +95,18 @@ def getTagged(text):
 	return tagged
 
 
-def getTopics(tagged):
+def getNPs(tagged):
 
-    # topic identification
+    # noun phrase identification
     chunks = NPChunker.parse(tagged)
-    topics = []
+    nps = []
     list_of_noun_phrases = ExtractPhrases(chunks, 'NP')
     for np in list_of_noun_phrases:
         if(not (len(np) == 1 and np[0][0] in stop)):
             #key = " ".join(word+"/"+tag for word, tag in np)
             key = " ".join(word for word, tag in np)
-            topics.append(key)
-    return topics
+            nps.append(key)
+    return nps
 
 def getSentiment(tagged):
 	sentiment = {'count':0,'score':0,'positive':0,'negative':0,'intensity':0,'positive_words':[],'negative_words':[]}
@@ -111,18 +124,18 @@ def getSentiment(tagged):
 				sentiment['intensity'] = sentiment['positive'] + (-1 * sentiment['negative'])
 	return sentiment
 
-def addBulk(topics):
+def addBulk(anchors):
 	bulk_data = [] 
-	for child in topics:
+	for child in anchors:
 		data_dict = {}
-		for i in topics[child]:
-			data_dict[i] = topics[child][i]
+		for i in anchors[child]:
+			data_dict[i] = anchors[child][i]
 
 		op_dict = {
 			"create": {
 				"_index": INDEX, 
 				"_type": TYPES, 
-				"_id": hash(topics[child]['topic']+topics[child]['parent'])
+				"_id": hash(anchors[child]['topic']+anchors[child]['parent'])
 			}
 		}
 		bulk_data.append(op_dict)
@@ -133,21 +146,7 @@ def addBulk(topics):
 
 if __name__=='__main__':
 
-	query = {
-        "query" : {
-            "bool" : { 
-                "must_not" : {
-                    "term" : { 
-                        "tagged" : True
-                    }
-                }
-            }
-        },
-		"size": 1000,
-    }
-
 	response= es.search(index="crowdynews", body=query)
-
 
 	for hit in response["hits"]["hits"]:
 		if 'text' in hit['_source']:
@@ -156,7 +155,6 @@ if __name__=='__main__':
 			doc = hit['_source']['title']
 		else:
 			continue
-			#pprint(hit['_source'])
 
 		if len(doc) == 0:
 			continue
@@ -167,7 +165,7 @@ if __name__=='__main__':
 		tagged = getTagged(text)
 		#print tagged
 
-		topics = {}
+		anchors = {}
 		retrieved = now()
 		# this should not occur, but just a safety check
 		if 'retrieved' not in hit['_source']:

@@ -34,139 +34,61 @@ from libact.base.dataset import Dataset
 from libact.models import LogisticRegression
 from libact.query_strategies import UncertaintySampling
 
-#from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch
+es = Elasticsearch(
+    ['http://controcurator.org/ess/'],
+    port=80)
 
-#ELASTIC_CREDENTIALS = '#elastic.json'
-#ELASTIC_INDEX       = ''
 
-def load_elastic():
 
-        topQuery = {"query": {
-        "filtered": {
-          "query": {
-            "query_string": {
-              "analyze_wildcard": True,
-              "query": "*"
-            }
-          },
-          "filter": {
-            "bool": {
-              "must": [
-                {
-                  "range": {
-                    "count": {
-                      "gt": 20,
-                    }
-                  }
-                }
-              ],
-              "must_not": []
-            }
-          }
-        }
-      },
-      "size": 0,
-      "aggs": {
-        "topics": {
-          "terms": {
-            "field": "topic",
-            "size": 20,
-            "order": {
-              "cont": "desc"
-            }
-          },
-          "aggs": {
-            "cont": {
-              "avg": {
-                "field": "controversy"
-              }
-            },
-            "pos": {
-              "sum": {
-                "field": "positive"
-              }
-            },
-            "neg": {
-              "sum": {
-                "field": "negative"
-              }
-            },
-            "count": {
-              "sum": {
-                "field": "count"
-              }
-            }
+def load_anchors():
+
+
+    #query = es.search(index="anchors", doc_type="vaccination")#, query=body)
+    #topTopics = top['aggregations']['topics']['buckets']
+
+    query = {
+    "query": {
+      "filtered": {
+        "query": {
+          "query_string": {
+            "query": "*",
+            "analyze_wildcard": True
           }
         }
       }
     }
+  }
 
-    # get top 10 topics
-    bottomQuery = {"query": {
-        "filtered": {
-          "query": {
-            "query_string": {
-              "analyze_wildcard": True,
-              "query": "*"
-            }
-          },
-          "filter": {
-            "bool": {
-              "must": [
-                {
-                  "range": {
-                    "count": {
-                      "gte": 10,
-                    }
-                  }
-                }
-              ],
-              "must_not": []
-            }
-          }
-        }
-      },
-      "size": 0,
-      "aggs": {
-        "topics": {
-          "terms": {
-            "field": "topic",
-            "size": 10,
-            "order": {
-              "cont": "asc"
-            }
-          },
-          "aggs": {
-            "cont": {
-              "avg": {
-                "field": "controversy"
-              }
-            },
-            "pos": {
-              "sum": {
-                "field": "positive"
-              }
-            },
-            "neg": {
-              "sum": {
-                "field": "negative"
-              }
-            },
-            "count": {
-              "sum": {
-                "field": "count"
-              }
-            }
-          }
-        }
-      }
-    }
+    response = es.search(index="anchors", body=query)
 
-    top = es.search(index="topics", doc_type="vaccination", body=topQuery)
-    topTopics = top['aggregations']['topics']['buckets']
+    data = pd.DataFrame([[anchor['_source']['name'],anchor['_source']['count'],anchor['_source']['positive'],anchor['_source']['negative']] for anchor in response['hits']['hits']])
 
+    '''
+    We need to keep track of the original topic name. This information is needed 
+    when asking the user whether the topic is controversial
+    '''
+    
+    names = list(data.ix[:,0])
+    
+    ''' 
+    As features we currently only look at # of 'positive' words (col 3),
+    # of 'negative' words (col 4), and'intensity' (col 5).
+    '''
+    
+    X = np.asarray(data.ix[:,2:3])
 
-    return pos,neg,name
+    '''
+    The active learning environment used here (libact) needs a few coded observation.
+    Otherwise search new data points won't work
+    Since the existing spreadsheet already ranked topics according to their controversy scores, 
+    I made a best guess, and assigned the first five to class 1 (controversial) and the last five
+    to class 0 (not controversial)
+    '''
+    
+    y = np.asarray([1,1,1,1,1] + [None]*(X.shape[0]-10)+[0,0,0,0,0])
+    return X,y,names
+
 
 def load_data(path_to_file):
     '''
@@ -174,6 +96,7 @@ def load_data(path_to_file):
     here understood as noun phrases, are given controversy scores.
     '''
     data = pd.read_excel(path_to_file, header=None,skiprows=1)
+
     
     '''
     We need to keep track of the original topic name. This information is needed 
@@ -185,7 +108,6 @@ def load_data(path_to_file):
     ''' 
     As features we currently only look at # of 'positive' words (col 3),
     # of 'negative' words (col 4), and'intensity' (col 5).
-
     '''
     
     X = np.asarray(data.ix[:,3:5])
@@ -239,7 +161,7 @@ def unsure(data=None):
 
     parameters
     ----
-    data: labelled
+    data: labeled
 
     returns
     --- 
@@ -304,48 +226,47 @@ def controversial():
 
     labeled_features = trn_ds.get_labeled_entries()
     positions = [i for i,a in enumerate(trn_ds.data) if trn_ds.data[i][1] != None]
-    datapoints = {
-            names[p]:{
-                    'score':model.predict(X[p])[0],
-                    # Get confidence for class one, i.e. the topic being controversial
-                    'confidence':model.predict_real(X[p])[0][1]
-                        } for p in positions
-                }
-    datapoints_sorted = sorted(datapoints.keys(), key=lambda x: (datapoints[x]['confidence']),reverse=True)
+    datapoints = []
+    for p in positions:
+      datapoints.append(
+                      {
+                      'anchor' : names[p],
+                      'score':model.predict(X[p])[0],
+                      # Get confidence for class one, i.e. the topic being controversial
+                      'confidence':model.predict_real(X[p])[0][1]
+                          } 
+                  )
+    datapoints_sorted = sorted(datapoints, key=lambda x: (x['confidence']),reverse=True)
     controversial    = datapoints_sorted[:10]
     noncontroversial = datapoints_sorted[-10:]
     results = {'controversial':controversial, 'noncontroversial':noncontroversial}
-    return json.dumps(results)
+    return results
 
 
 
 if __name__=='__main__':
-	## DEMO ##
-	# Initialize the model
-	X,y,names = load_data('Topics.xlsx')
-	model,trn_ds = initialize_model(X,y)
-	qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
-	# Cell used for simulation, we randomly annotate words as being controversial or not 
-	# During each iteration we update the model.
-	# Lastly we call the 'controversial' function and sort all topics as controversial
-	# or not based on the confidence score returned by the logistic regression
-	import warnings
-	warnings.filterwarnings('ignore')
+  ## DEMO ##
+  # Initialize the model
+  #X,y,names = load_data('/Users/Benjamin/Sites/controcurator/python_code/Topics.xlsx')
+  X,y,names = load_anchors()
+  model,trn_ds = initialize_model(X,y)
+  qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
+  # Cell used for simulation, we randomly annotate words as being controversial or not 
+  # During each iteration we update the model.
+  # Lastly we call the 'controversial' function and sort all topics as controversial
+  # or not based on the confidence score returned by the logistic regression
+  import warnings
+  warnings.filterwarnings('ignore')
 
-	n_turns = 10
-	answers = ['noncontroversial','controversial']*int(n_turns/2)
-	random.shuffle(answers)
-	for t in range(n_turns):
-		result = unsure()
-		print(u'Annotating the data point {} as {}'.format(result,answers[t]))
-		labeled = {json.loads(result)['unsure']:{'label':answers[t],'ip':'127.0.01'}}
-		unsure(json.dumps(labeled)) 
-	print('\n')
-	controversies = controversial()
-	controversies = json.loads(controversies)
-	print('-----controversial topics-----')
-	print('\n'.join(controversies['controversial']))
-	print('\n')
-	print('-----noncontroversial topics-----')
-	print('\n'.join(controversies['noncontroversial']))
+  n_turns = 10
+  answers = ['noncontroversial','controversial']*int(n_turns/2)
+  random.shuffle(answers)
+#  for t in range(n_turns):
+#    result = unsure()
+#    labeled = {json.loads(result)['unsure']:{'label':answers[t],'ip':'127.0.01'}}
+#    unsure(json.dumps(labeled)) 
+
+  controversies = controversial()
+  print(json.dumps(controversies))
+
 
