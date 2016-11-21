@@ -2,6 +2,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tree import *
 from elasticsearch import Elasticsearch
+from esengine import Document, StringField
 from nltk.corpus import sentiwordnet as swn
 import string
 from pprint import pprint
@@ -9,28 +10,16 @@ import justext
 import time
 import datetime
 
+def print_r(the_object):
+    print ("CLASS: ", the_object.__class__.__name__, " (BASE CLASS: ", the_object.__class__.__bases__,")")
+    pprint(vars(the_object))
+
+es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 stop = stopwords.words('english') + list(string.punctuation)
-es = Elasticsearch(
-    ['http://controcurator.org/ess/'],
-    port=80)
+
 INDEX  = 'anchors'
 TYPES = 'vaccination'
 LOGDEX = 'crowdylog'
-now = lambda: datetime.datetime.utcnow().isoformat()
-
-
-query = {
-    "query" : {
-        "bool" : { 
-            "must_not" : {
-                "term" : { 
-                    "tagged" : True
-                }
-            }
-        }
-    },
-	"size": 1000,
-}
 
 
 # NP patterns   
@@ -43,7 +32,73 @@ pattern = r"""
 NPChunker = nltk.RegexpParser(pattern) # create a chunk parser
 anchors = []
 
+# An anchor is an entity for which we measure controversy
+# This can be for instance a noun phrase, a named entity, a sentence
+# Anchors are stored in the anchors index, whith their seed as document type (e.g. 'vaccination')
+# Each instance of an anchor is cached in an anchor entity
+class Anchor(Document):
 
+	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
+	_index = "anchors"  # optional, it can be set after using "having" method
+	_doctype = "vaccination"  # optional, it can be set after using "having" method
+
+	# the current time
+	now = lambda: datetime.datetime.utcnow().isoformat()
+
+	# initiate a new anchor
+	# set existing anchor if it is in the database
+	@staticmethod
+	def add(seed, key, label, instance):
+
+		# check if this anchor exists
+		anchor = Anchor.exists(seed, key)
+		if(anchor):
+			self = anchor
+		else:
+			# new anchor
+			self = Anchor.create()
+			self.key = key
+			self.label = label
+			self.instances = []
+			self.count = 0
+			self.positive = 0
+			self.negative = 0
+			self.controversy = 0
+			self.created = self.now
+			self.updated = self.now
+			self.addInstance(instance)
+			self.updateCache()
+
+	@staticmethod
+	def exists(seed, key):
+		try:
+			anchor = Anchor.get(id=key)
+			print anchor
+			return anchor
+		except:
+			return False
+
+
+
+	def children(self):
+		# Return documents that this anchor appears in
+		return {}
+
+
+	def addInstance(self, instance):
+		# adds this instance to the cache of the anchor
+		self.count += 1
+		self.instances.append(instance)
+	
+	def updateCache(self):
+		# aggregate all instances in the anchor cache
+		self.sentiment = 0.5
+
+	def firstInstance(self):
+		return 'first'
+
+	def lastInstance(self):
+		return 'last'
 
 
 def ExtractPhrases( myTree, phrase):
@@ -58,11 +113,7 @@ def ExtractPhrases( myTree, phrase):
     return myPhrases
 
 
-es = Elasticsearch(
-    ['http://controcurator.org/ess/'],
-    http_auth=('user', 'aminoglycoside'),
-    port=80
-)
+
 
 def treebank_to_wordnet_pos(treebank, skipWordNetPos=[]):
     if "NN" in treebank and "n" not in skipWordNetPos: # singular and plural nouns (NN, NNS)
@@ -146,6 +197,19 @@ def addBulk(anchors):
 
 if __name__=='__main__':
 
+	query = {
+	    "query" : {
+	        "bool" : { 
+	            "must_not" : {
+	                "term" : { 
+	                    "tagged" : True
+	                }
+	            }
+	        }
+	    },
+		"size": 10,
+	}
+
 	response= es.search(index="crowdynews", body=query)
 
 	for hit in response["hits"]["hits"]:
@@ -158,6 +222,12 @@ if __name__=='__main__':
 
 		if len(doc) == 0:
 			continue
+
+		anchor = Anchor.add('vaccination','needle','Needle','doc1')
+		anchor = Anchor.add('vaccination','autism','Autism','doc2')
+		anchor = Anchor.add('vaccination','needle','Needle','doc2')
+		print_r(anchor)
+		break
 
 		#print doc
 		text = getText(doc)
