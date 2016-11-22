@@ -10,6 +10,8 @@ if __name__=='__main__':
 
 	for anchor in anchors:
 		a = Anchor.getOrCreate(seed, anchor.lower(), anchor)
+		a.findInstances()
+		a.save()
 
 
 	"""

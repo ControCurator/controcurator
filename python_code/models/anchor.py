@@ -1,14 +1,10 @@
-import nltk
-from nltk.corpus import stopwords
-from nltk.tree import *
 from elasticsearch import Elasticsearch
-from esengine import Document, StringField, IntegerField, FloatField, DateField, ArrayField
-from nltk.corpus import sentiwordnet as swn
-import string
+from esengine import Document, StringField, IntegerField, FloatField, DateField, ArrayField, ObjectField
 from pprint import pprint
-import justext
 import time
 import datetime
+
+from pfe import *
 
 def print_r(the_object):
     print ("CLASS: ", the_object.__class__.__name__, " (BASE CLASS: ", the_object.__class__.__bases__,")")
@@ -33,7 +29,7 @@ class Anchor(Document):
 
 	id = StringField()
 	label = StringField()
-	#instances = ArrayField()
+	instances = ArrayField()
 	count = IntegerField()
 	positive = FloatField()
 	negative = FloatField()
@@ -49,17 +45,18 @@ class Anchor(Document):
 		now = lambda: datetime.datetime.utcnow().isoformat()
 		anchor.id = key
 		anchor.label = label
-		#self.instances = []
+		anchor.instances = []
 		anchor.count = 0
 		anchor.positive = 0
 		anchor.negative = 0
 		anchor.controversy = 0
 		anchor.created = now()
 		anchor.updated = now()
-		anchor.save()
+		#anchor.save()
 		#addInstance(instance)
 		#updateCache()
 		print 'NEW',key
+		return anchor
 
 	@staticmethod
 	def getOrCreate(seed, key, label):
@@ -74,21 +71,40 @@ class Anchor(Document):
 			anchor = Anchor.create(key, label)
 		return anchor
 
+	def findInstances(self):
+		# searches for new instances of this anchor
+		key = self.id
+		query = {"query":{"bool":{"must":[{"term":{"text":key}}]}},"size":1}
+		response = es.search(index="crowdynews", body=query)
+		for hit in response["hits"]["hits"]:
+			self.addInstance(hit)
+		update = self.updateCache()
+		print update
+		return update
 
-	def instances(self):
+	def updateCache(self):
+		# update aggregated cache of features
+		# returns count of previous existing entities, current entities and added entities
+		update = {}
+		update['previous'] = self.count
+		update['current'] = len(self.instances)
+		self.count = update['current']
+		update['added'] = update['current'] - update['previous']
+		return update
+
+	def getInstances(self):
 		# Return documents that this anchor appears in
-		# instances = self.instances
-		return []
+		# TODO: change to actually getting the set of documents
+		return self.instances
 
 
 	def addInstance(self, instance):
 		# adds this instance to the cache of the anchor
-		self.count += 1
-		self.instances.append(instance)
-	
-	def updateCache(self):
-		# aggregate all instances in the anchor cache
-		self.sentiment = 0.5
+		if instance not in self.instances:
+			if 'anchors' not in instance['_source']:
+				# if the document is not analysed yet with the PFE, we must trigger this now
+				getAnchors(instance)
+			self.instances.append(instance['_id'])
 
 	def firstInstance(self):
 		return 'first'
@@ -99,82 +115,7 @@ class Anchor(Document):
 
 
 
-def ExtractPhrases( myTree, phrase):
-    myPhrases = []
-    if (myTree.label()==phrase):
-        myPhrases.append( myTree.copy(True) )
-    for child in myTree:
-        if (type(child) is Tree):
-            list_of_phrases = ExtractPhrases(child, phrase)
-            if (len(list_of_phrases) > 0):
-                myPhrases.extend(list_of_phrases)
-    return myPhrases
 
-
-
-
-
-
-
-def treebank_to_wordnet_pos(treebank, skipWordNetPos=[]):
-    if "NN" in treebank and "n" not in skipWordNetPos: # singular and plural nouns (NN, NNS)
-        return "n"
-    elif "JJ" in treebank and "a" not in skipWordNetPos: # adjectives including comparatives and superlatives (JJ, JJR, JJS)
-        return "a" 
-    elif "VB" in treebank and "v" not in skipWordNetPos: # verbs in various forms (VB, VBD, VBG, VBN, VBP, VBZ)
-        return "v"
-    elif "RB" in treebank and "r" not in skipWordNetPos: # adverbs including comparatives and superlatives (RB, RBR, RBS)
-        return "r"
-    # if we don't match any of these we implicitly return None
-
-def get_sentiment_score_from_tagged(token, treebank, skipWordNetPos=[]):
-    wordnet_pos = treebank_to_wordnet_pos(treebank, skipWordNetPos)
-    if wordnet_pos: # only print matches
-        senti_synsets = list(swn.senti_synsets(token, wordnet_pos))
-        if senti_synsets:
-            return senti_synsets[0].pos_score() - senti_synsets[0].neg_score()
-
-def getText(document):
-	paragraphs = justext.justext(document, justext.get_stoplist("English"))
-	return ''.join(paragraph.text for paragraph in paragraphs)
-
-
-def getTagged(text):
-	tagged = []
-	sentences = nltk.sent_tokenize(text) # NLTK default sentence segmenter
-	words = [nltk.word_tokenize(sent) for sent in sentences]
-	tagged = [nltk.pos_tag(word) for word in words]
-	return tagged
-
-
-def getNPs(tagged):
-
-    # noun phrase identification
-    chunks = NPChunker.parse(tagged)
-    nps = []
-    list_of_noun_phrases = ExtractPhrases(chunks, 'NP')
-    for np in list_of_noun_phrases:
-        if(not (len(np) == 1 and np[0][0] in stop)):
-            #key = " ".join(word+"/"+tag for word, tag in np)
-            key = " ".join(word for word, tag in np)
-            nps.append(key)
-    return nps
-
-def getSentiment(tagged):
-	sentiment = {'count':0,'score':0,'positive':0,'negative':0,'intensity':0,'positive_words':[],'negative_words':[]}
-	for word, treebank in tagged:
-		score = get_sentiment_score_from_tagged(word, treebank, skipWordNetPos=[])
-		if score:
-			sentiment['count'] += 1
-			sentiment['score'] += score
-			if score > 0:
-				sentiment['positive'] += score
-				sentiment['positive_words'].append(word)
-			else:
-				sentiment['negative'] += score
-				sentiment['negative_words'].append(word)
-				sentiment['intensity'] = sentiment['positive'] + (-1 * sentiment['negative'])
-	return sentiment
 
 def addBulk(anchors):
 	bulk_data = [] 
@@ -216,15 +157,6 @@ if __name__=='__main__':
 	response= es.search(index="crowdynews", body=query)
 
 	for hit in response["hits"]["hits"]:
-		if 'text' in hit['_source']:
-			doc = hit['_source']['text']
-		elif 'title' in hit['_source']:
-			doc = hit['_source']['title']
-		else:
-			continue
-
-		if len(doc) == 0:
-			continue
 
 		anchor = newAnchor('vaccination','needle','Needle','doc1')
 		print_r(anchor)
@@ -235,11 +167,7 @@ if __name__=='__main__':
 		print anchor.firstInstance()
 		break
 
-		#print doc
-		text = getText(doc)
-		#print text
-		tagged = getTagged(text)
-		#print tagged
+
 
 		anchors = {}
 		retrieved = now()
