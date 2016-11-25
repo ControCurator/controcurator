@@ -29,11 +29,8 @@ class Anchor(Document):
 
 	id = StringField()
 	label = StringField()
-	instances = ArrayField()
-	count = IntegerField()
-	positive = FloatField()
-	negative = FloatField()
-	controversy = FloatField()
+	instances = ObjectField()
+	features = ObjectField()
 	created = DateField()
 	updated = DateField()
 
@@ -45,17 +42,14 @@ class Anchor(Document):
 		now = lambda: datetime.datetime.utcnow().isoformat()
 		anchor.id = key
 		anchor.label = label
-		anchor.instances = []
-		anchor.count = 0
-		anchor.positive = 0
-		anchor.negative = 0
-		anchor.controversy = 0
+		anchor.instances = {}
+		anchor.features = {'total_instances' : 0}
 		anchor.created = now()
 		anchor.updated = now()
 		#anchor.save()
 		#addInstance(instance)
 		#updateCache()
-		print 'NEW',key
+		#print 'NEW',key
 		return anchor
 
 	@staticmethod
@@ -68,29 +62,35 @@ class Anchor(Document):
 		#	print anchor
 		except:
 			# new anchor
+			print 'NEW',key
 			anchor = Anchor.create(key, label)
 		return anchor
 
 	def findInstances(self):
 		# searches for new instances of this anchor
 		key = self.id
-		query = {"query":{"bool":{"must":[{"term":{"text":key}}]}},"size":1}
+		query = {"query":{"bool":{"must":[{"term":{"text":key}},{"term":{"service":"webpage"}}]}},"size":2}
 		response = es.search(index="crowdynews", body=query)
 		for hit in response["hits"]["hits"]:
 			self.addInstance(hit)
-		update = self.updateCache()
-		print update
-		return update
+		self.updateCache()
+		#print update
+		return self.instances
 
 	def updateCache(self):
 		# update aggregated cache of features
 		# returns count of previous existing entities, current entities and added entities
-		update = {}
-		update['previous'] = self.count
-		update['current'] = len(self.instances)
-		self.count = update['current']
-		update['added'] = update['current'] - update['previous']
-		return update
+		features = {}
+		features['total_instances'] = len(self.instances)
+		print 'Updated:',features['total_instances'] - self.features['total_instances']
+
+		# update sentiment
+		df = pd.DataFrame.from_dict(self.instances, orient='index')
+		mean = df.mean()
+		total = df.sum()
+		features.update({k:v for k, v in mean.iteritems()})
+		features.update({k:v for k, v in total.iteritems()})
+		self.features = features
 
 	def getInstances(self):
 		# Return documents that this anchor appears in
@@ -100,11 +100,13 @@ class Anchor(Document):
 
 	def addInstance(self, instance):
 		# adds this instance to the cache of the anchor
-		if instance not in self.instances:
-			if 'anchors' not in instance['_source']:
+		if instance['_id'] not in self.instances:
+			if 'features' not in instance['_source']:
 				# if the document is not analysed yet with the PFE, we must trigger this now
-				getAnchors(instance)
-			self.instances.append(instance['_id'])
+				unit = Unit.get(id=instance['_id'])
+				features = unit.getFeatures()
+				unit.save()
+			self.instances[instance['_id']] = features
 
 	def firstInstance(self):
 		return 'first'
@@ -160,56 +162,13 @@ if __name__=='__main__':
 
 		anchor = newAnchor('vaccination','needle','Needle','doc1')
 		print_r(anchor)
-		anchor = newAnchor('vaccination','autism','Autism','doc2')
-		print_r(anchor)
-		anchor = newAnchor('vaccination','needle','Needle','doc2')
-		print_r(anchor)
+#		anchor = newAnchor('vaccination','autism','Autism','doc2')
+#		print_r(anchor)
+#		anchor = newAnchor('vaccination','needle','Needle','doc2')
+#		print_r(anchor)
 		print anchor.firstInstance()
 		break
-
-
-
-		anchors = {}
-		retrieved = now()
-		# this should not occur, but just a safety check
-		if 'retrieved' not in hit['_source']:
-			continue
-		date = hit['_source']['retrieved']
-		if 'date' in hit['_source']:
-			date = hit['_source']['date']
-
-		for sentence in tagged:
-
-			sentiment = getSentiment(sentence)
-			#print sentiment
-#			sentenceTopics = getTopics(sentence)
-#			for t in sentenceTopics:
-#				if t.lower() not in stop:
-#					if t not in topics:
-#						topics[t] = {'topic':t,'type':'NOUN','date':date,'retrieved':retrieved,'parent':hit['_id'],'service':hit['_type'],'count':0,'words':0,'positive':0,'negative':0,'intensity':0,'controversy':0}
-#					topics[t]['count'] += 1
-#					topics[t]['words'] += sentiment['count']
-#					topics[t]['positive'] += sentiment['positive']
-#					topics[t]['negative'] += sentiment['negative']
-#					topics[t]['intensity'] = topics[t]['positive'] + (-1 * topics[t]['negative'])
-#					topics[t]['controversy'] = topics[t]['intensity'] / max(abs(topics[t]['positive'] - (-1 * topics[t]['negative'])),1)
-		
-			for chunk in nltk.ne_chunk(sentence):
-				if type(chunk) is nltk.Tree:
-					t = ' '.join(c[0] for c in chunk.leaves())
-					cat = chunk.label()
-#					print t,cat
-					if t not in topics:
-						topics[t] = {'topic':t,'type':cat,'date':date,'retrieved':retrieved,'parent':hit['_id'],'service':hit['_type'],'count':0,'words':0,'positive':0,'negative':0,'intensity':0,'controversy':0}
-
-					if t in topics:
-						topics[t]['type'] = cat
-					topics[t]['count'] += 1
-					topics[t]['words'] += sentiment['count']
-					topics[t]['positive'] += sentiment['positive']
-					topics[t]['negative'] += sentiment['negative']
-					topics[t]['intensity'] = topics[t]['positive'] + (-1 * topics[t]['negative'])
-					topics[t]['controversy'] = topics[t]['intensity'] / max(abs(topics[t]['positive'] - (-1 * topics[t]['negative'])),1)
+	
 
 
 		if topics:
