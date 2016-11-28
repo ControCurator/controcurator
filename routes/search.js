@@ -15,7 +15,7 @@ var summarize = function(str) {
 function loadSearch() {
     return function(req, res, next) {
     	
-        var url = 'http://controcurator.org/ess/vaccination/article/_search?q='+req.params.id;
+        var url = 'http://controcurator.org/ess/crowdynews/webpage/_search?q='+req.params.id;
         req.searchResults = [];
         request({ uri: url, json: true }, function(err, resp, data) {
             if (err) return res.sendStatus(500);

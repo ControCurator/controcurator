@@ -8,7 +8,7 @@ block content
             - each anchor,i in results.controversial
                 div(style='display:block;')
                     - var rounded = Math.round(anchor.confidence*100)/100
-                    a(href='/browse/search/'+i, class='term neutral') #{anchor.anchor}
+                    a(href='/browse/search/'+anchor.anchor, class='term neutral') #{anchor.anchor}
                     div(style='float:right') #{rounded}
 
         include annotation
@@ -20,7 +20,7 @@ block content
             - each anchor,i in results.noncontroversial
                 div(style='display:block;')
                     - var rounded = Math.round(anchor.confidence*100)/100
-                    a(href='/browse/search/'+i, class='term neutral') #{anchor.anchor}
+                    a(href='/browse/search/'+anchor.anchor, class='term neutral') #{anchor.anchor}
                     div(style='float:right') #{rounded}
 
 

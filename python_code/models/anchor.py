@@ -4,7 +4,7 @@ from pprint import pprint
 import time
 import datetime
 
-from pfe import *
+from entity import *
 
 def print_r(the_object):
     print ("CLASS: ", the_object.__class__.__name__, " (BASE CLASS: ", the_object.__class__.__bases__,")")
@@ -22,7 +22,6 @@ class Anchor(Document):
 	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 	_index = "anchors"  # optional, it can be set after using "having" method
 	_doctype = "vaccination"  # optional, it can be set after using "having" method
-
 
 	# initiate a new anchor
 	# set existing anchor if it is in the database
@@ -69,8 +68,9 @@ class Anchor(Document):
 	def findInstances(self):
 		# searches for new instances of this anchor
 		key = self.id
-		query = {"query":{"bool":{"must":[{"term":{"text":key}},{"term":{"service":"webpage"}}]}},"size":2}
+		query = {"query":{"bool":{"must":[{"query_string":{"default_field":"_all","query":key}},{"term":{"service":"webpage"}}]}},"size":2}
 		response = es.search(index="crowdynews", body=query)
+		print 'FOUND',len(response["hits"]["hits"])
 		for hit in response["hits"]["hits"]:
 			self.addInstance(hit)
 		self.updateCache()
@@ -90,6 +90,9 @@ class Anchor(Document):
 		total = df.sum()
 		features.update({k:v for k, v in mean.iteritems()})
 		features.update({k:v for k, v in total.iteritems()})
+
+
+
 		self.features = features
 
 	def getInstances(self):
@@ -103,9 +106,10 @@ class Anchor(Document):
 		if instance['_id'] not in self.instances:
 			if 'features' not in instance['_source']:
 				# if the document is not analysed yet with the PFE, we must trigger this now
-				unit = Unit.get(id=instance['_id'])
-				features = unit.getFeatures()
-				unit.save()
+				entity = Entity.get(id=instance['_id'])
+				#print_r(entity)
+				features = entity.getFeatures()
+				#entity.save()
 			self.instances[instance['_id']] = features
 
 	def firstInstance(self):

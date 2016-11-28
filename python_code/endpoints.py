@@ -35,6 +35,11 @@ from libact.models import LogisticRegression
 from libact.query_strategies import UncertaintySampling
 
 from elasticsearch import Elasticsearch
+
+from esengine import Payload, Query, Filter
+from models.anchor import *
+
+
 es = Elasticsearch(
     ['http://controcurator.org/ess/'],
     port=80)
@@ -47,29 +52,16 @@ def load_anchors():
     #query = es.search(index="anchors", doc_type="vaccination")#, query=body)
     #topTopics = top['aggregations']['topics']['buckets']
 
-    query = {
-    "query": {
-      "filtered": {
-        "query": {
-          "query_string": {
-            "query": "*",
-            "analyze_wildcard": True
-          }
-        }
-      }
-    }
-  }
+    anchors = Anchor.all(size=20)
 
-    response = es.search(index="anchors", body=query)
 
-    data = pd.DataFrame([[anchor['_source']['name'],anchor['_source']['count'],anchor['_source']['positive'],anchor['_source']['negative']] for anchor in response['hits']['hits']])
-
+    data = pd.DataFrame([a.features for a in anchors], index=[a._id for a in anchors])
     '''
     We need to keep track of the original topic name. This information is needed 
     when asking the user whether the topic is controversial
     '''
     
-    names = list(data.ix[:,0])
+    names = data.index
     
     ''' 
     As features we currently only look at # of 'positive' words (col 3),
@@ -247,8 +239,9 @@ def controversial():
 if __name__=='__main__':
   ## DEMO ##
   # Initialize the model
-  #X,y,names = load_data('/Users/Benjamin/Sites/controcurator/python_code/Topics.xlsx')
   X,y,names = load_anchors()
+
+  #X,y,names = load_anchors()
   model,trn_ds = initialize_model(X,y)
   qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
   # Cell used for simulation, we randomly annotate words as being controversial or not 
@@ -268,5 +261,4 @@ if __name__=='__main__':
 
   controversies = controversial()
   print(json.dumps(controversies))
-
 

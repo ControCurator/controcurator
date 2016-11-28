@@ -40,19 +40,26 @@ es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 # Each instance of an anchor is cached in an anchor entity
 
 
-class Unit(Document):
+class Entity(Document):
 
 	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 	_index = "crowdynews"  # optional, it can be set after using "having" method
 	_doctype = "webpage"
 
+	features = ObjectField()
+	url = StringField()
+	text = StringField()
+	service = StringField()
+	archive = StringField()
+	date = DateField()
+	retrieved = DateField()
 
 	def getTexts(self):
 		# get the content of the instance by combining the title and text
 		texts = []
 #		print self.text
-		if hasattr(self, 'title'):
-			texts.append(self.title)
+#		if hasattr(self, 'title'):
+#			texts.append(self.title)
 		if hasattr(self, 'text'):
 			texts.append(self.text)
 		return texts
@@ -60,7 +67,9 @@ class Unit(Document):
 	def verifyLanguage(self, texts):
 		# verify that the text contains only western characters
 		# otherwise the document is ignored
-		if not all(ord(c) < 128 for c in ' '.join(texts)):
+		if texts[0] == None:
+			raise ValueError('The document has no text')
+		if all(ord(c) < 128 for c in ' '.join(texts)):
 			raise ValueError('The document contains illegal characters')
 
 	def cleanTexts(self, texts):
@@ -110,12 +119,15 @@ class Unit(Document):
 
 		#hasAuthor : boolean
 		#hasTitle : boolean
+		try:
+			texts = self.getTexts()
+			#self.verifyLanguage(texts)
+			texts = self.cleanTexts(texts)
+	#		print self.text
+		except:
+			texts = []
 
-		texts = self.getTexts()
-		self.verifyLanguage(texts)
-#		print self.text
 
-		texts = self.cleanTexts(texts)
 
 		paragraphs = self.getParagraphs(texts)
 #		pprint(self.paragraphs)
@@ -126,25 +138,23 @@ class Unit(Document):
 		entities = self.getEntities(sentences)
 #		pprint(self.entities)
 
-
 		features = {}
 		features['paragraphs'] = len(paragraphs)
 		features['sentences'] = len(sentences)
 		features['entities'] = len(entities)
 		features['characters'] = sum([len(text) for text in texts])
-		features['entities'] = entities
 
 		df = pd.DataFrame([entity['sentiment'] for entity in entities])
 		mean = df.mean()
 		total = df.sum()
-		features['sentiment'] = {}
-		features['sentiment'].update({'mean_'+k:v for k, v in mean.iteritems()})
-		features['sentiment'].update({'total_'+k:v for k, v in total.iteritems()})
+		features.update({'mean_'+k:v for k, v in mean.iteritems()})
+		features.update({'total_'+k:v for k, v in total.iteritems()})
 		print '-UPDATED',self.id
 		self.features = features
 
+
 	def getFeatures(self):
-		if not hasattr(self, 'features'):
+		if len(self.features) == 0:
 			self.updateFeatures()
 		return self.features
 
@@ -248,7 +258,7 @@ if __name__=='__main__':
 	response = es.search(index="crowdynews", body=query)
 	for hit in response["hits"]["hits"]:
 		try:
-			features = Unit(hit).getFeatures()
+			features = Entity(hit).getFeatures()
 			pprint(features)
 		except ValueError as e:
 			print e
