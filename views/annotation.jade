@@ -1,15 +1,39 @@
 block annotation
 
-	.ui.stacked.segment
-		h2.ui.teal.header
-			.content Annotate
-		div.annotation
-			p.task Is Vaccination a controversial topic?
-			div
-				input(type='radio',name='controversial',value='Yes',class='ui button')
-				'Yes'
-			div
-				input(type='radio',name='controversial',value='No',class='ui button')
-				'No'
-			div
-				button(id='annotate',class='ui button') Save
+	.seven.wide.column
+		.ui.segment
+			h1.ui.dividing.header Help to better understand this article  
+			p  Please read the item on the left and look at the discussion below it. 
+			p
+				| Please tell us  
+				b your personal
+				|  perspective is on the following questions:
+			p
+				.ui.checkbox
+					input(type='checkbox', id='q1', name='q1')
+					label(for='q1') The topic or claims in this text are 
+						b likely to upset some people
+			p
+				.ui.checkbox
+					input(type='checkbox', id='q2', name='q2')
+					label(for='q2') I am aware of 
+						b other opinions about this topic
+			p
+				.ui.checkbox
+					input(type='checkbox', id='q3', name='q3')
+					label(for='q3') This is a 
+						b popular topic
+			p
+				.ui.checkbox
+					input(type='checkbox', id='q4', name='q4')
+					label(for='q4') This is a 
+						b strongly debated topic
+
+			br
+			p  I think this item is 
+				.centered.ui.buttons
+					button.ui.grey.button Not Controversial
+					.or
+					button.ui.negative.button Controversial
+
+				button.ui.primary.right.floated.button(id='annotate') Save

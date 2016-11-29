@@ -237,28 +237,62 @@ def controversial():
 
 
 if __name__=='__main__':
-  ## DEMO ##
-  # Initialize the model
-  X,y,names = load_anchors()
 
-  #X,y,names = load_anchors()
-  model,trn_ds = initialize_model(X,y)
-  qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
-  # Cell used for simulation, we randomly annotate words as being controversial or not 
-  # During each iteration we update the model.
-  # Lastly we call the 'controversial' function and sort all topics as controversial
-  # or not based on the confidence score returned by the logistic regression
-  import warnings
-  warnings.filterwarnings('ignore')
+  input = sys.argv[1:]
+  task = input[0]
 
-  n_turns = 10
-  answers = ['noncontroversial','controversial']*int(n_turns/2)
-  random.shuffle(answers)
-#  for t in range(n_turns):
-#    result = unsure()
-#    labeled = {json.loads(result)['unsure']:{'label':answers[t],'ip':'127.0.01'}}
-#    unsure(json.dumps(labeled)) 
+  if task == 'anchor' and len(input) == 3:
+    # return anchor
 
-  controversies = controversial()
-  print(json.dumps(controversies))
+    seed = input[1]
+    anchor = input[2]
+
+    try:
+      anchor = Anchor.get(id=anchor)
+      instances = anchor.getInstances()
+      print json.dumps(instances)
+    except:
+      print json.dumps([])
+
+
+
+  if task == 'article' and len(input) == 3:
+    # return article
+
+    seed = input[1]
+    article = input[2]
+
+    try:
+      article = Article.get(id=article)
+      print json.dumps(vars(article), default=str)
+    except:
+      print json.dumps([])
+
+
+  if task == 'controversial':
+
+    ## DEMO ##
+    # Initialize the model
+    X,y,names = load_anchors()
+
+    #X,y,names = load_anchors()
+    model,trn_ds = initialize_model(X,y)
+    qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
+    # Cell used for simulation, we randomly annotate words as being controversial or not 
+    # During each iteration we update the model.
+    # Lastly we call the 'controversial' function and sort all topics as controversial
+    # or not based on the confidence score returned by the logistic regression
+    import warnings
+    warnings.filterwarnings('ignore')
+
+    n_turns = 10
+    answers = ['noncontroversial','controversial']*int(n_turns/2)
+    random.shuffle(answers)
+  #  for t in range(n_turns):
+  #    result = unsure()
+  #    labeled = {json.loads(result)['unsure']:{'label':answers[t],'ip':'127.0.01'}}
+  #    unsure(json.dumps(labeled)) 
+
+    controversies = controversial()
+    print(json.dumps(controversies))
 

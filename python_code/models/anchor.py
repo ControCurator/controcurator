@@ -4,7 +4,7 @@ from pprint import pprint
 import time
 import datetime
 
-from entity import *
+from article import *
 
 def print_r(the_object):
     print ("CLASS: ", the_object.__class__.__name__, " (BASE CLASS: ", the_object.__class__.__bases__,")")
@@ -98,7 +98,8 @@ class Anchor(Document):
 	def getInstances(self):
 		# Return documents that this anchor appears in
 		# TODO: change to actually getting the set of documents
-		return self.instances
+		instances = Article.filter(ids=self.instances.keys())
+		return instances._values
 
 
 	def addInstance(self, instance):
@@ -106,10 +107,10 @@ class Anchor(Document):
 		if instance['_id'] not in self.instances:
 			if 'features' not in instance['_source']:
 				# if the document is not analysed yet with the PFE, we must trigger this now
-				entity = Entity.get(id=instance['_id'])
+				article = Article.get(id=instance['_id'])
 				#print_r(entity)
-				features = entity.getFeatures()
-				#entity.save()
+				features = article.getFeatures()
+				#article.save()
 			self.instances[instance['_id']] = features
 
 	def firstInstance(self):

@@ -40,7 +40,7 @@ es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 # Each instance of an anchor is cached in an anchor entity
 
 
-class Entity(Document):
+class Article(Document):
 
 	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 	_index = "crowdynews"  # optional, it can be set after using "having" method
@@ -121,7 +121,7 @@ class Entity(Document):
 		#hasTitle : boolean
 		try:
 			texts = self.getTexts()
-			#self.verifyLanguage(texts)
+			#self.verifyLanguage(texts
 			texts = self.cleanTexts(texts)
 	#		print self.text
 		except:
@@ -158,6 +158,10 @@ class Entity(Document):
 			self.updateFeatures()
 		return self.features
 
+	def getJSON(self):
+		# returns JSON safe dict of the article
+		# this is needed to avoid issues with timestamps
+		return self._values
 
 
 
@@ -258,7 +262,7 @@ if __name__=='__main__':
 	response = es.search(index="crowdynews", body=query)
 	for hit in response["hits"]["hits"]:
 		try:
-			features = Entity(hit).getFeatures()
+			features = Article(hit).getFeatures()
 			pprint(features)
 		except ValueError as e:
 			print e

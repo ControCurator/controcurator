@@ -4,7 +4,7 @@ from pprint import pprint
 import time
 import datetime
 
-from entity import *
+from article import *
 
 def print_r(the_object):
     print ("CLASS: ", the_object.__class__.__name__, " (BASE CLASS: ", the_object.__class__.__bases__,")")
@@ -27,7 +27,7 @@ class Judgment(Document):
 	# set existing anchor if it is in the database
 
 	id = IntegerField() # A hash of the document+worker
-	entity = StringField()
+	article = StringField()
 	worker = StringField()
 	content = ArrayField()
 	accepted = DateField()
@@ -35,11 +35,11 @@ class Judgment(Document):
 
 
 	@staticmethod
-	def create(key, entity, content, ip):
+	def create(key, article, content, ip):
 		judgment = Judgment()
 
 		# the current time
-		judgment.id = hash(entity+ip)
+		judgment.id = hash(article+ip)
 		judgment.worker = ip
 		judgment.content = content
 		judgment.accepted = now()
@@ -48,10 +48,10 @@ class Judgment(Document):
 		return judgment
 
 
-	def getDocument(self):
+	def getArticle(self):
 		# return the entity of this judgment
-		return Entity().get(id=this.entity)
+		return Article().get(id=this.entity)
 
-	def getDocumentJudgments(self):
+	def getArticleJudgments(self):
 		# return a set with all judgments on this entity
 		return []

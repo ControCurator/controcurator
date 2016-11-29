@@ -2,11 +2,15 @@ extends layout
 
 block content
 
-  - if (!results.found)
-    h2.ui.ten.wide.column 
-      | Article "<strong>#{id}</strong>" cannot be found.
-  - else
-    div.ui.segment
-      h1: a(href='/browse/article/' + results._id) #{results._source.title}
-      div.passage
-        != results.content
+	include annotation
+
+	- if (!results._id)
+		h2.ui.ten.wide.column 
+		| Article "<strong>#{id}</strong>" related to "<strong>#{seed}</strong>" does not exist.
+	- else
+		div.ui.segment
+			h1.ui.dividing.header: #{results._id}
+			div.ui.items
+				div.item
+					div.content
+						!= results.text

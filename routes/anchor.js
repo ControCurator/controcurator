@@ -1,7 +1,7 @@
 var express = require('express');
 _ = require('underscore')._
 var request = require('request');
-var router = express.Router();
+var router = express.Router({mergeParams: true});
 var exec = require('child_process').exec;
 var path = require('path');
 var parentDir = path.resolve(process.cwd());
@@ -15,25 +15,26 @@ var summarize = function(str) {
     return str.substr(0, ~ind ? ind : 200);
 }
 
-function loadSearch() {
+function loadAnchor() {
     return function(req, res, next) {
 
-  
-        var child = exec('python '+parentDir+'/python_code/endpoints.py controversial', function(err, stdout, stderr) {
+        var seed = req.params.seed;
+        var id = req.params.id;
+
+        var child = exec('python '+parentDir+'/python_code/endpoints.py anchor '+seed+' '+id, function(err, stdout, stderr) {
             if (err) console.log(err);
             else {
-                console.log(stdout);
+                //console.log(stdout);
                 req.data = JSON.parse(stdout);
                 //console.log(req.data.controversial);
                 next();
             }
         });
-
     };
 }
 
-router.get('/', loadSearch(), function(req, res, next) {
-    res.render('index', { 'title':'ControCurator', q: req.query.q, results: req.data});
+router.get('/', loadAnchor(), function(req, res, next) {
+    res.render('anchor', { 'title':'ControCurator', 'seed': req.params.seed, 'id': req.params.id, results: req.data});
 });
 
 module.exports = router;
