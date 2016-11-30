@@ -20,8 +20,8 @@ es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 class Judgment(Document):
 
 	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
-	_index = "judgments"  # optional, it can be set after using "having" method
-	_doctype = "annotation"  # optional, it can be set after using "having" method
+	_index = "controcurator"  # optional, it can be set after using "having" method
+	_doctype = "judgment"  # optional, it can be set after using "having" method
 
 	# initiate a new anchor
 	# set existing anchor if it is in the database

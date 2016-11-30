@@ -55,7 +55,7 @@ def load_anchors():
     anchors = Anchor.all(size=20)
 
 
-    data = pd.DataFrame([a.features for a in anchors], index=[a._id for a in anchors])
+    data = pd.DataFrame([a.type]+[a.features for a in anchors], index=[a._id for a in anchors])
     '''
     We need to keep track of the original topic name. This information is needed 
     when asking the user whether the topic is controversial

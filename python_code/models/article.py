@@ -29,30 +29,30 @@ NPChunker = nltk.RegexpParser(pattern) # create a chunk parser
 es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 
 
-#
-# Base Primitive Feature class
-#
 
-
-# An anchor is an entity for which we measure controversy
-# This can be for instance a noun phrase, a named entity, a sentence
-# Anchors are stored in the anchors index, whith their seed as document type (e.g. 'vaccination')
-# Each instance of an anchor is cached in an anchor entity
+# Articles are any kind of document
 
 
 class Article(Document):
 
 	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
-	_index = "crowdynews"  # optional, it can be set after using "having" method
-	_doctype = "webpage"
+	_index = "controcurator"  # optional, it can be set after using "having" method
+	_doctype = "article"
 
+	id = StringField()
 	features = ObjectField()
 	url = StringField()
+	title = StringField()
+	body = StringField()
 	text = StringField()
+	sentences = ArrayField()
+	entities = ArrayField()
 	service = StringField()
-	archive = StringField()
-	date = DateField()
+
+	published = DateField()
 	retrieved = DateField()
+	children = ArrayField()
+	parent = StringField()
 
 	def getTexts(self):
 		# get the content of the instance by combining the title and text
@@ -132,6 +132,9 @@ class Article(Document):
 		paragraphs = self.getParagraphs(texts)
 #		pprint(self.paragraphs)
 		sentences = self.getSentences(paragraphs)
+
+		# store the sentences so that we can reference to them and make easy summarizations
+		self.sentences = sentences
 
 #		pprint(self.sentences)
 #		self.sentiment = aggregateSentiment(sentences)
@@ -251,19 +254,4 @@ class Sentence():
 
 
 
-
-
-	#print tagged
-
-
-# Testing function
-if __name__=='__main__':
-	query = {"query":{"match_all":{}},"size":5}
-	response = es.search(index="crowdynews", body=query)
-	for hit in response["hits"]["hits"]:
-		try:
-			features = Article(hit).getFeatures()
-			pprint(features)
-		except ValueError as e:
-			print e
 

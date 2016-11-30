@@ -20,8 +20,8 @@ es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 class Anchor(Document):
 
 	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
-	_index = "anchors"  # optional, it can be set after using "having" method
-	_doctype = "vaccination"  # optional, it can be set after using "having" method
+	_index = "controcurator"  # optional, it can be set after using "having" method
+	_doctype = "anchor"  # optional, it can be set after using "having" method
 
 	# initiate a new anchor
 	# set existing anchor if it is in the database
@@ -52,7 +52,7 @@ class Anchor(Document):
 		return anchor
 
 	@staticmethod
-	def getOrCreate(seed, key, label):
+	def getOrCreate(key, label):
 
 		# check if this anchor exists
 		try:
@@ -68,8 +68,8 @@ class Anchor(Document):
 	def findInstances(self):
 		# searches for new instances of this anchor
 		key = self.id
-		query = {"query":{"bool":{"must":[{"query_string":{"default_field":"_all","query":key}},{"term":{"service":"webpage"}}]}},"size":2}
-		response = es.search(index="crowdynews", body=query)
+		query = {"query":{"bool":{"must":[{"query_string":{"default_field":"_all","query":key}}]}},"size":2}
+		response = es.search(index="controcurator", doc_type='article', body=query)
 		print 'FOUND',len(response["hits"]["hits"])
 		for hit in response["hits"]["hits"]:
 			self.addInstance(hit)
@@ -113,73 +113,6 @@ class Anchor(Document):
 				#article.save()
 			self.instances[instance['_id']] = features
 
-	def firstInstance(self):
-		return 'first'
+	def setGroundTruth(self, feature, value):
+		self.features['gt_'+feature] = float(value)
 
-	def lastInstance(self):
-		return 'last'
-
-
-
-
-
-
-def addBulk(anchors):
-	bulk_data = [] 
-	for child in anchors:
-		data_dict = {}
-		for i in anchors[child]:
-			data_dict[i] = anchors[child][i]
-
-		op_dict = {
-			"create": {
-				"_index": INDEX, 
-				"_type": TYPES, 
-				"_id": hash(anchors[child]['topic']+anchors[child]['parent'])
-			}
-		}
-		bulk_data.append(op_dict)
-		bulk_data.append(data_dict)
-
-	#pprint(bulk_data)
-	res = es.bulk(index = INDEX, body = bulk_data)
-
-if __name__=='__main__':
-
-	Anchor.init()
-
-	query = {
-	    "query" : {
-	        "bool" : { 
-	            "must_not" : {
-	                "term" : { 
-	                    "tagged" : True
-	                }
-	            }
-	        }
-	    },
-		"size": 10,
-	}
-
-	response= es.search(index="crowdynews", body=query)
-
-	for hit in response["hits"]["hits"]:
-
-		anchor = newAnchor('vaccination','needle','Needle','doc1')
-		print_r(anchor)
-#		anchor = newAnchor('vaccination','autism','Autism','doc2')
-#		print_r(anchor)
-#		anchor = newAnchor('vaccination','needle','Needle','doc2')
-#		print_r(anchor)
-		print anchor.firstInstance()
-		break
-	
-
-
-		if topics:
-#			for t in topics:
-				#print t+' - '+topics[t]['type']
-			addBulk(topics)
-		es.update(index = hit['_index'], doc_type=hit['_type'], id=hit['_id'], body = {'doc':{'tagged' : True}})
-		#break
-	#pprint(topics)
