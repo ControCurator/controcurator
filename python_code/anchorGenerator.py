@@ -6,8 +6,8 @@ if __name__=='__main__':
 
 
 	# TEMP: Wipe existing anchors
-	anchors = Anchor.all(size=1000)
-	Anchor.delete_all(anchors)
+#	anchors = Anchor.all(size=1000)
+#	Anchor.delete_all(anchors)
 
 	# THIS IS TEMPORARY:
 	anchors = {'Vaccination', 'Vaccinations', 'Vaccine', 'Vaccines', 'Inoculation', 'Immunization', 'Shot', 'Chickenpox', 'Disease', 'Diseases', 'Hepatitis A', 'Hepatitis B', 'infection', 'infections', 'measles', 'outbreak', 'mumps', 'rabies', 'tetanus', 'virus', 'autism'}

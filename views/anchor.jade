@@ -4,13 +4,12 @@ block content
 
   - if (!results.length)
     h2.ui.ten.wide.column 
-      | No articles about "<strong>#{id}</strong>" related to "<strong>#{seed}</strong>" were found.
+      | No articles about "<strong>#{id}</strong>" were found.
   - else
-    h2.ui.header.ten.wide.column Articles about "#{id}" related to "#{seed}"
+    h2.ui.header.ten.wide.column Articles about "#{id}"
 
     - each article in results
       div.ui.raised.padded.text.container.segment
-        h2.ui.header: a(href='/browse/article/' + seed + '/' + article._id) #{article._id}
-        div #{article._source.url}
-        p
-          //!= summarize(link._source.text)
+        h2.ui.dividing.header: a(href='/browse/article/' + article._id) #{article._source.title}
+        - each sentence in article._source.sentences
+          span #{sentence}

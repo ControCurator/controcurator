@@ -6,41 +6,35 @@ from models.articles.guardian import *
 # main function
 if __name__=='__main__':
 
-	anchors = Guardian.all(size=1000)
-	Guardian.delete_all(anchors)
-
 	# load file
-	directory = '/Users/benjamin/Downloads/source_GuardianandWiki/'
+	'''
+	articles = Guardian.all(size=1000)
+	Guardian.delete_all(articles)
+
+	anchors = Anchor.all(size=1000)
+	Anchor.delete_all(anchors)
+	'''
+
+	directory = '/Users/benjamin/Downloads/controcurator_data_with_wiki/'
 
 	files = os.listdir(directory)
-	for file in files:
+	for file in files[10:]:
 		# for each file
 		print file
-
+		if file.startswith('.'):
+			continue
 		with open(directory+file) as f:
 
 			data = json.load(f)
 			body = data['response']['content']['blocks']['body'][0]
-			print body['lastModifiedDate']
-			print data['response']['content']['webTitle'].encode('UTF-8')
+			#print body['lastModifiedDate']
+			print '- ',data['response']['content']['webTitle'].encode('UTF-8')
 
 			article = Guardian.create(data)
 			article.save()
 
-		break
 
-		# add article
 
 
 			# add comments as article children
 
-
-		# add wiki topics as anchors
-		'''
-		for anchor in anchors:
-			a = Anchor.getOrCreate('guardian-import', anchor.lower(), anchor)
-			a.findInstances()
-			a.save()
-		'''
-		
-		#print added article.id

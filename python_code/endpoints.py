@@ -54,8 +54,7 @@ def load_anchors():
 
     anchors = Anchor.all(size=20)
 
-
-    data = pd.DataFrame([a.type]+[a.features for a in anchors], index=[a._id for a in anchors])
+    data = pd.DataFrame([a.features for a in anchors if a.features['entities'] > 0], index=[a.label for a in anchors if a.features['entities'] > 0])
     '''
     We need to keep track of the original topic name. This information is needed 
     when asking the user whether the topic is controversial
@@ -231,7 +230,8 @@ def controversial():
     datapoints_sorted = sorted(datapoints, key=lambda x: (x['confidence']),reverse=True)
     controversial    = datapoints_sorted[:10]
     noncontroversial = datapoints_sorted[-10:]
-    results = {'controversial':controversial, 'noncontroversial':noncontroversial}
+    keys = {label:label.replace(' ','_').lower() for label in names}
+    results = {'controversial':controversial, 'noncontroversial':noncontroversial, 'keys':keys}
     return results
 
 
@@ -241,26 +241,28 @@ if __name__=='__main__':
   input = sys.argv[1:]
   task = input[0]
 
-  if task == 'anchor' and len(input) == 3:
+  if task == 'anchor' and len(input) == 2:
     # return anchor
 
-    seed = input[1]
-    anchor = input[2]
+    anchor = input[1]
 
     try:
       anchor = Anchor.get(id=anchor)
       instances = anchor.getInstances()
+
+      for i in instances:
+        i['_source']['sentences'] = i['_source']['sentences'][0:2]
+
       print json.dumps(instances)
     except:
       print json.dumps([])
 
 
 
-  if task == 'article' and len(input) == 3:
+  if task == 'article' and len(input) == 2:
     # return article
 
-    seed = input[1]
-    article = input[2]
+    article = input[1]
 
     try:
       article = Article.get(id=article)

@@ -22,7 +22,7 @@ function loadSearch() {
         var child = exec('python '+parentDir+'/python_code/endpoints.py controversial', function(err, stdout, stderr) {
             if (err) console.log(err);
             else {
-                console.log(stdout);
+                //console.log(stdout);
                 req.data = JSON.parse(stdout);
                 //console.log(req.data.controversial);
                 next();

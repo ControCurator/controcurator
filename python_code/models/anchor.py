@@ -34,15 +34,15 @@ class Anchor(Document):
 	updated = DateField()
 
 	@staticmethod
-	def create(key, label):
+	def create(key):
 		anchor = Anchor()
 
 		# the current time
 		now = lambda: datetime.datetime.utcnow().isoformat()
-		anchor.id = key
-		anchor.label = label
+		anchor.id = key.replace(' ', '_').lower()
+		anchor.label = key
 		anchor.instances = {}
-		anchor.features = {'total_instances' : 0}
+		anchor.features = {'instances' : 0, 'entities' : 0}
 		anchor.created = now()
 		anchor.updated = now()
 		#anchor.save()
@@ -52,17 +52,17 @@ class Anchor(Document):
 		return anchor
 
 	@staticmethod
-	def getOrCreate(key, label):
+	def getOrCreate(key):
 
 		# check if this anchor exists
 		try:
-			anchor = Anchor.get(id=key)
-			print 'EXISTING:',key
+			anchor = Anchor.get(id=key.replace(' ', '_').lower())
+			#print 'EXISTING:',key
 		#	print anchor
 		except:
 			# new anchor
-			print 'NEW',key
-			anchor = Anchor.create(key, label)
+			#print 'NEW',key.encode('utf-8')
+			anchor = Anchor.create(key)
 		return anchor
 
 	def findInstances(self):
@@ -70,7 +70,7 @@ class Anchor(Document):
 		key = self.id
 		query = {"query":{"bool":{"must":[{"query_string":{"default_field":"_all","query":key}}]}},"size":2}
 		response = es.search(index="controcurator", doc_type='article', body=query)
-		print 'FOUND',len(response["hits"]["hits"])
+		#print 'FOUND',len(response["hits"]["hits"])
 		for hit in response["hits"]["hits"]:
 			self.addInstance(hit)
 		self.updateCache()
@@ -80,12 +80,14 @@ class Anchor(Document):
 	def updateCache(self):
 		# update aggregated cache of features
 		# returns count of previous existing entities, current entities and added entities
-		features = {}
-		features['total_instances'] = len(self.instances)
-		print 'Updated:',features['total_instances'] - self.features['total_instances']
+		features = self.features
+		features['instances'] = len(self.instances)
+		entities = {i+'-'+str(s):self.instances[i][s] for i in self.instances for s in self.instances[i]}
+		features['entities'] = len(entities)
+		#print 'Updated:',features['instances'] - self.features['instances']
 
 		# update sentiment
-		df = pd.DataFrame.from_dict(self.instances, orient='index')
+		df = pd.DataFrame.from_dict(entities, orient='index')
 		mean = df.mean()
 		total = df.sum()
 		features.update({k:v for k, v in mean.iteritems()})
@@ -102,17 +104,24 @@ class Anchor(Document):
 		return instances._values
 
 
-	def addInstance(self, instance):
+	def addInstance(self, instance, sentence, features):
 		# adds this instance to the cache of the anchor
-		if instance['_id'] not in self.instances:
+		if instance not in self.instances:
+			self.instances[instance] = {}
+
+			'''
 			if 'features' not in instance['_source']:
 				# if the document is not analysed yet with the PFE, we must trigger this now
 				article = Article.get(id=instance['_id'])
 				#print_r(entity)
 				features = article.getFeatures()
 				#article.save()
-			self.instances[instance['_id']] = features
+			else:
+				features = instance['_source']['features']
+			'''
+		self.instances[instance][sentence] = features
+		self.updateCache()
 
 	def setGroundTruth(self, feature, value):
-		self.features['gt_'+feature] = float(value)
+		self.features['gt_'+feature] = value
 

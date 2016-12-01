@@ -2,15 +2,16 @@ extends layout
 
 block content
 
-	include annotation
-
 	- if (!results._id)
 		h2.ui.ten.wide.column 
-		| Article "<strong>#{id}</strong>" related to "<strong>#{seed}</strong>" does not exist.
+		| Article "<strong>#{id}</strong>" does not exist.
 	- else
+
 		div.ui.segment
-			h1.ui.dividing.header: #{results._id}
+			h1.ui.dividing.header: != results.title
 			div.ui.items
 				div.item
 					div.content
-						!= results.text
+						!= results.html
+
+		include annotation

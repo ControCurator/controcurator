@@ -16,7 +16,6 @@ class Guardian(Article):
 		article.id = data['response']['content']['blocks']['body'][0]['id']
 		article.url = data['response']['content']['webUrl']
 		article.title = data['response']['content']['webTitle']
-		article.body = data['response']['content']['blocks']['body'][0]['bodyHtml']
 		article.text = data['response']['content']['blocks']['body'][0]['bodyTextSummary']
 		article.service = 'guardianImport'
 
@@ -26,9 +25,12 @@ class Guardian(Article):
 
 		article.updateFeatures()
 
+		# add ControWiki as ground truth
 		for anchor in data['response']['content']['ControWiki']:
-			a = Anchor.getOrCreate(anchor[0].lower(), anchor[0])
-			a.setGroundTruth('controversy', anchor[1])
-			a.save()
+			if anchor[1] == anchor[1]:
+				# check if not NaN
+				a = Anchor.getOrCreate(anchor[0])
+				a.setGroundTruth('controversy', anchor[1])
+				a.save()
 
 		return article

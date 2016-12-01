@@ -10,6 +10,7 @@ import re
 import pandas as pd
 from esengine import Document, StringField, IntegerField, FloatField, DateField, ArrayField, ObjectField
 
+from anchor import *
 
 # Primitive Feature Extration
 # abstract class that extracts primitive features for a given document
@@ -42,11 +43,11 @@ class Article(Document):
 	id = StringField()
 	features = ObjectField()
 	url = StringField()
+	author = ObjectField()
 	title = StringField()
-	body = StringField()
 	text = StringField()
 	sentences = ArrayField()
-	entities = ArrayField()
+	entities = ObjectField()
 	service = StringField()
 
 	published = DateField()
@@ -69,7 +70,7 @@ class Article(Document):
 		# otherwise the document is ignored
 		if texts[0] == None:
 			raise ValueError('The document has no text')
-		if all(ord(c) < 128 for c in ' '.join(texts)):
+		if all(ord(c) < 128 for c in ' '.join(texts[:1])):
 			raise ValueError('The document contains illegal characters')
 
 	def cleanTexts(self, texts):
@@ -93,7 +94,7 @@ class Article(Document):
 
 	def getEntities(self, sentences):
 		# get all named entities and their sentiment
-		entities = []
+		entities = {}
 		for i in range(len(sentences)):
 			sentence = Sentence(sentences[i])
 			# POS tag this sentence
@@ -101,15 +102,22 @@ class Article(Document):
 			sentiment = sentence.getSentiment()
 			
 			sentenceEntities = sentence.getNamedEntities()
-			sentenceEntities.update(sentence.getNounPhrases())
+			#sentenceEntities.update(sentence.getNounPhrases())
 
 			for entity in sentenceEntities:
-				entities.append({
-					'key' : entity.lower(),
-					'type' : sentenceEntities[entity],
-					'sentence' : i,
-					'sentiment' : sentiment
-					})
+				e = entity.replace(' ', '_').lower()
+				if e not in entities:
+					entities[e] = {}
+				if i not in entities[e]:
+					entities[e][i] = {}
+				entities[e][i]['label'] = entity
+				entities[e][i]['type'] = sentenceEntities[entity]
+				entities[e][i]['sentiment'] = sentiment
+
+				a = Anchor.getOrCreate(entity)
+				a.addInstance(self.id, i, sentiment)
+				#print 'Instance',self.id,i,entity
+				a.save()
 
 		return entities
 
@@ -121,12 +129,11 @@ class Article(Document):
 		#hasTitle : boolean
 		try:
 			texts = self.getTexts()
-			#self.verifyLanguage(texts
+			self.verifyLanguage(texts)
 			texts = self.cleanTexts(texts)
 	#		print self.text
 		except:
 			texts = []
-
 
 
 		paragraphs = self.getParagraphs(texts)
@@ -135,11 +142,13 @@ class Article(Document):
 
 		# store the sentences so that we can reference to them and make easy summarizations
 		self.sentences = sentences
+		if len(sentences) == 0:
+			raise ValueError('Article has no sentences')
 
 #		pprint(self.sentences)
 #		self.sentiment = aggregateSentiment(sentences)
 		entities = self.getEntities(sentences)
-#		pprint(self.entities)
+		self.entities = entities
 
 		features = {}
 		features['paragraphs'] = len(paragraphs)
@@ -147,7 +156,7 @@ class Article(Document):
 		features['entities'] = len(entities)
 		features['characters'] = sum([len(text) for text in texts])
 
-		df = pd.DataFrame([entity['sentiment'] for entity in entities])
+		df = pd.DataFrame([entities[e][s]['sentiment'] for e in entities for s in entities[e]])
 		mean = df.mean()
 		total = df.sum()
 		features.update({'mean_'+k:v for k, v in mean.iteritems()})

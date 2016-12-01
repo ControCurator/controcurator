@@ -18,10 +18,9 @@ var summarize = function(str) {
 function loadAnchor() {
     return function(req, res, next) {
 
-        var seed = req.params.seed;
         var id = req.params.id;
-
-        var child = exec('python '+parentDir+'/python_code/endpoints.py anchor '+seed+' '+id, function(err, stdout, stderr) {
+        console.log('python '+parentDir+'/python_code/endpoints.py anchor '+id)
+        var child = exec('python '+parentDir+'/python_code/endpoints.py anchor '+id, {maxBuffer: 1024 * 500}, function(err, stdout, stderr) {
             if (err) console.log(err);
             else {
                 //console.log(stdout);
@@ -34,7 +33,7 @@ function loadAnchor() {
 }
 
 router.get('/', loadAnchor(), function(req, res, next) {
-    res.render('anchor', { 'title':'ControCurator', 'seed': req.params.seed, 'id': req.params.id, results: req.data});
+    res.render('anchor', { 'title':'ControCurator', 'id': req.params.id, results: req.data});
 });
 
 module.exports = router;

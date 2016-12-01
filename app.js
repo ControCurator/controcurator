@@ -27,8 +27,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/anchor/:seed/:id', anchor);
-app.use('/article/:seed/:id', article);
+app.use('/anchor/:id', anchor);
+app.use('/article/:id', article);
 app.use('/users', users);
 
 
