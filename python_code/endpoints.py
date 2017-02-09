@@ -196,7 +196,7 @@ def unsure(data=None):
        
         return json.dumps(results)
 
-def controversial():
+def controversial(trn_ds):
     '''
     implements the /controversial endpoint. 
 
@@ -276,6 +276,7 @@ if __name__=='__main__':
     ## DEMO ##
     # Initialize the model
     X,y,names = load_anchors()
+    print X,y,names
 
     #X,y,names = load_anchors()
     model,trn_ds = initialize_model(X,y)
@@ -295,6 +296,6 @@ if __name__=='__main__':
   #    labeled = {json.loads(result)['unsure']:{'label':answers[t],'ip':'127.0.01'}}
   #    unsure(json.dumps(labeled)) 
 
-    controversies = controversial()
+    controversies = controversial(trn_ds)
     print(json.dumps(controversies))
 

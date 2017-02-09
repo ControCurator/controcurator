@@ -14,7 +14,7 @@ if __name__=='__main__':
 	seed = 'vaccination'
 
 	for anchor in anchors:
-		a = Anchor.getOrCreate(anchor.lower(), anchor)
+		a = Anchor.getOrCreate(anchor)
 		a.findInstances()
 		a.save()
 

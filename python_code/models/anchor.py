@@ -104,12 +104,12 @@ class Anchor(Document):
 		return instances._values
 
 
-	def addInstance(self, instance, sentence, features):
+	def addInstance(self, instance):#, sentence, features):
 		# adds this instance to the cache of the anchor
-		if instance not in self.instances:
-			self.instances[instance] = {}
+		if instance['_id'] not in self.instances:
+			self.instances[instance['_id']] = {}
 
-			'''
+			
 			if 'features' not in instance['_source']:
 				# if the document is not analysed yet with the PFE, we must trigger this now
 				article = Article.get(id=instance['_id'])
@@ -118,8 +118,8 @@ class Anchor(Document):
 				#article.save()
 			else:
 				features = instance['_source']['features']
-			'''
-		self.instances[instance][sentence] = features
+			
+		self.instances[instance['_id']] = features
 		self.updateCache()
 
 	def setGroundTruth(self, feature, value):
