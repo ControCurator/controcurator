@@ -276,7 +276,6 @@ if __name__=='__main__':
     ## DEMO ##
     # Initialize the model
     X,y,names = load_anchors()
-    print X,y,names
 
     #X,y,names = load_anchors()
     model,trn_ds = initialize_model(X,y)
