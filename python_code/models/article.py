@@ -114,8 +114,10 @@ class Article(Document):
 				entities[e][i]['type'] = sentenceEntities[entity]
 				entities[e][i]['sentiment'] = sentiment
 
+
+
 				a = Anchor.getOrCreate(entity)
-				a.addInstance(self.id, i, sentiment)
+				#a.addInstance(self.id, i, sentiment)
 				#print 'Instance',self.id,i,entity
 				a.save()
 

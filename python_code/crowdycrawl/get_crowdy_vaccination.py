@@ -11,9 +11,9 @@ from pprint import pprint
 
 MAXTRIES = 5
 
-ARTICLES = 'https://q.crowdynews.com/v1/articles/controcuratorguardian?count=100'
-SOURCE = 'guardian'
-#SOCMEDS = 'https://q.crowdynews.com/v1/content/controcurator?q=BOxE9ZZ-vaccination&count=100'
+ARTICLES = 'http://q.crowdynews.com/v1/articles/controcurator?count=100'
+SOURCE = 'guardian-vaccination'
+SOCMEDS = 'https://q.crowdynews.com/v1/content/controcurator?q=BOxE9ZZ-vaccination&count=100'
 
 BASE = 'http://q.crowdynews.com'
 
@@ -22,7 +22,6 @@ client = elasticsearch.Elasticsearch(
     port=80)
 INDEX  = 'crowdynews'
 LOGDEX = 'crowdylog'
-
 
 ARTCOUNT = 0
 ARTCOUNTNEW = 0
@@ -169,8 +168,8 @@ if __name__=='__main__':
 	print('started at {}'.format(start))
 	print('retieving articles at {}'.format(now()))
 	get_articles()
-	#print('retrieving social media at {}'.format(now()))
-	#get_socmed()
+	print('retrieving social media at {}'.format(now()))
+	get_socmed()
 	print('finished at {}'.format(now()))
 	log = dict(
 		starttime = start,
@@ -185,3 +184,4 @@ if __name__=='__main__':
 	)
 	pprint(log)
 	client.create(LOGDEX, doc_type='retrieval_log', body=log)
+
