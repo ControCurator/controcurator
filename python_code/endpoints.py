@@ -52,7 +52,19 @@ def load_anchors():
     #query = es.search(index="anchors", doc_type="vaccination")#, query=body)
     #topTopics = top['aggregations']['topics']['buckets']
 
-    anchors = Anchor.all(size=20)
+    query = {"query": {
+        "bool": {
+            "must": [{
+                "range": {
+                    "features.instances": {
+                        "gt": "0"
+                    }
+                }
+            }],
+        }
+    }
+    }
+    anchors = Anchor.search(query, size=10)
 
     data = pd.DataFrame([a.features for a in anchors if a.features['entities'] > 0], index=[a.label for a in anchors if a.features['entities'] > 0])
     '''

@@ -72,7 +72,7 @@ class Anchor(Document):
 		response = es.search(index="controcurator", doc_type='article', body=query)
 		#print 'FOUND',len(response["hits"]["hits"])
 		for hit in response["hits"]["hits"]:
-			self.addInstance(hit)
+			self.addInstance(hit['_id'])
 		self.updateCache()
 		#print update
 		return self.instances
@@ -106,20 +106,20 @@ class Anchor(Document):
 
 	def addInstance(self, instance):#, sentence, features):
 		# adds this instance to the cache of the anchor
-		if instance['_id'] not in self.instances:
-			self.instances[instance['_id']] = {}
+		if instance not in self.instances:
+			self.instances[instance] = {}
 
 			
 			if 'features' not in instance['_source']:
 				# if the document is not analysed yet with the PFE, we must trigger this now
-				article = Article.get(id=instance['_id'])
+				article = Article.get(id=instance)
 				#print_r(entity)
 				features = article.getFeatures()
 				#article.save()
 			else:
 				features = instance['_source']['features']
 			
-		self.instances[instance['_id']] = features
+			self.instances[instance] = features
 		self.updateCache()
 
 	def setGroundTruth(self, feature, value):

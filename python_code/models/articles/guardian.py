@@ -23,7 +23,7 @@ class Guardian(Article):
 		article.retrieved = now()
 		article.children = []
 
-		article.updateFeatures()
+		#article.updateFeatures()
 
 		# add ControWiki as ground truth
 		for anchor in data['response']['content']['ControWiki']:

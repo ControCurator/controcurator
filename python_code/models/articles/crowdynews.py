@@ -18,11 +18,11 @@ class CrowdyNews(Article):
 		article.url = data['url']
 		article.text = data['text']
 		article.service = data['service']
-		article.author = {
+		'''article.author = {
 			'url' : data['author']['url'],
 			'label' : data['author']['name'],
 			'image' : data['author']['image']
-		}
+		}'''
 
 		article.published = data['date']
 		article.retrieved = now()

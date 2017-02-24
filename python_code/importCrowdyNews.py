@@ -12,25 +12,13 @@ es = Elasticsearch(
 # main function
 if __name__=='__main__':
 
-	articles = CrowdyNews.all(size=1000)
-	CrowdyNews.delete_all(articles)
+	#articles = CrowdyNews.all(size=1000)
+	#CrowdyNews.delete_all(articles)
 
 	anchors = Anchor.all(size=1000)
-	Anchor.delete_all(anchors)
+	#Anchor.delete_all(anchors)
 
-	query = {
-		"query" : {
-			"bool" : { 
-				"must" : {
-					"term" : { 
-						"service" : "twitter"
-					}
-				}
-			}
-		},
-	"size": 100,
-	}
-
+	query = {"query" : {"match_all" : {}}, "from": 0, "size": 1000}
 
 	# load cached entries
 	response = es.search(index="crowdynews", body=query)
@@ -48,11 +36,11 @@ if __name__=='__main__':
 
 
 		# add wiki topics as anchors
-		'''
+		
 		for anchor in anchors:
-			a = Anchor.getOrCreate('guardian-import', anchor.lower(), anchor)
+			a = Anchor.getOrCreate(anchor.id.lower())
 			a.findInstances()
 			a.save()
-		'''
+		
 		
 		#print added article.id

@@ -117,7 +117,7 @@ class Article(Document):
 
 
 				a = Anchor.getOrCreate(entity)
-				#a.addInstance(self.id, i, sentiment)
+				#a.addInstance(self.id)#, i, sentiment)
 				#print 'Instance',self.id,i,entity
 				a.save()
 
@@ -145,7 +145,8 @@ class Article(Document):
 		# store the sentences so that we can reference to them and make easy summarizations
 		self.sentences = sentences
 		if len(sentences) == 0:
-			raise ValueError('Article has no sentences')
+			return False
+			#raise ValueError('Article has no sentences')
 
 #		pprint(self.sentences)
 #		self.sentiment = aggregateSentiment(sentences)

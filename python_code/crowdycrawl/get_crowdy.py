@@ -8,6 +8,9 @@ import datetime
 import time
 from collections import Counter
 from pprint import pprint
+import sys
+import os
+from models.articles.crowdynews import *
 
 MAXTRIES = 5
 
@@ -18,8 +21,8 @@ SOURCE = 'guardian'
 BASE = 'http://q.crowdynews.com'
 
 client = elasticsearch.Elasticsearch(
-    ['http://controcurator.org/ess/'],
-    port=80)
+	['http://controcurator.org/ess/'],
+	port=80)
 INDEX  = 'crowdynews'
 LOGDEX = 'crowdylog'
 
@@ -54,6 +57,10 @@ def get_articles(tries = MAXTRIES):
 		article['retrieved'] =	now()
 		article['source'] =	SOURCE
 		res = client.index('crowdynews', id=article_id, doc_type=article['service'],body=article)
+		
+		savedArticle = CrowdyNews.create(article)
+		savedArticle.save()
+
 		if(res['created'] == True):
 			global ARTCOUNTNEW
 			ARTCOUNTNEW += 1
@@ -82,23 +89,26 @@ def get_article_children(article, article_id, tries = MAXTRIES):
 	artChildren = 0
 	time = now()
 	for child in children:
-	    data_dict = {}
-	    for i in child:
+		data_dict = {}
+		for i in child:
 			artChildren += 1
 			data_dict[i] = child[i]
-	    data_dict['parent'] = article_id
-	    data_dict['retrieved'] = time
-	    data_dict['source'] = SOURCE
-	    pprint(data_dict)
-	    op_dict = {
-	        "create": {
-	            "_index": INDEX, 
-	            "_type": child.get('service','unknown'), 
-	            "_id": data_dict['id']
-	        }
-	    }
-	    bulk_data.append(op_dict)
-	    bulk_data.append(data_dict)
+		data_dict['parent'] = article_id
+		data_dict['retrieved'] = time
+		data_dict['source'] = SOURCE
+		pprint(data_dict)
+		op_dict = {
+			"create": {
+				"_index": INDEX, 
+				"_type": child.get('service','unknown'), 
+				"_id": data_dict['id']
+			}
+		}
+		bulk_data.append(op_dict)
+		bulk_data.append(data_dict)
+
+		savedArticle = CrowdyNews.create(data_dict)
+		savedArticle.save()
 
 
 	res = client.bulk(index = INDEX, body = bulk_data)
@@ -136,6 +146,10 @@ def get_socmed(tries = MAXTRIES):
 		socmed['retrieved'] = now()
 		socmed['source'] = SOURCE
 		res = client.index(INDEX, id=socmed.get('id',None), doc_type=socmed.get('service','unknown'),body=socmed)
+		
+		savedArticle = CrowdyNews.create(socmed)
+		savedArticle.save()
+
 		print('retrieved '+socmed.get('service','unknown')+' status: '+str(res['created'])+' id: '+socmed.get('id',None))
 		#get_socchild(socmed)
 
@@ -162,6 +176,10 @@ def get_socchild(socmed, tries = MAXTRIES):
 		child['retrieved'] = now()
 		child['source'] = SOURCE
 		res = client.index(INDEX, id=child.get('id',None), doc_type=child.get('service','unknown'),body=child)
+
+		savedArticle = CrowdyNews.create(socmed)
+		savedArticle.save()
+
 		print('retrieved '+child.get('service','unknown')+' status: '+str(res['created'])+' id: '+child.get('id',None))
 
 if __name__=='__main__':
