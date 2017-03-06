@@ -1,29 +1,13 @@
 #!/bin/python
-from __future__ import division
-'''
 
-This file provides an active learning environment for the demo interface.
-Needs the file 'Topic.xlsx' as input.
+#import sys
+import sys
+sys.path.insert(0, '../models')
+from article import Article
 
-
-Description of functionality
----
-
-data model:
-    COMMENT KASPAR: I interpreted 'score' as the class of the noun phrase, i.e. 0 or 1.
-    datapoint = { str(noun phrase) : { 'score': float(controversy score), 'confidence':float(confidence)}}
-    estimates = l st(datapoint1, .... , datapointN) 
-    labelled  = { str(noun phrase) : { 'label' : 'controversial' OR 'noncontroversial') , 'ip' : str(ip address of user) } }
-
----
-
-Controversy is labelled on the noun-phrase (here considered topic) level. 
-Timestamps should be implemented on the backend side. 
-
-'''
 import random # while real data lacks
 import json
-import sys
+
 import os
 # KB: Added modules
 import numpy as np
@@ -35,7 +19,7 @@ from libact.models import LogisticRegression
 from libact.query_strategies import UncertaintySampling
 
 from elasticsearch import Elasticsearch
-from ..models import article
+from elasticsearch_dsl import Search, Q
 
 
 es = Elasticsearch(
@@ -44,9 +28,7 @@ es = Elasticsearch(
 
 
 if __name__=='__main__':
-
-    articles = article.Article.get(size=10)
-
-    documents = loadDocuments()
-    print(json.dumps(articles))
+    s = Search(using=es, index="controcurator")
+    response = s.execute()
+    print(json.dumps([hit for hit in response]))
 
