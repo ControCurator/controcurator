@@ -1,22 +1,13 @@
 #!/bin/python
-
-#import sys
-import sys
-sys.path.insert(0, '../models')
-from article import Article
-
 import random # while real data lacks
 import json
 
+import sys
 import os
 # KB: Added modules
 import numpy as np
 import pandas as pd
 import random
-# libact classes
-from libact.base.dataset import Dataset
-from libact.models import LogisticRegression
-from libact.query_strategies import UncertaintySampling
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
@@ -28,7 +19,15 @@ es = Elasticsearch(
 
 
 if __name__=='__main__':
-    s = Search(using=es, index="controcurator")
-    response = s.execute()
-    print(json.dumps([hit for hit in response]))
+    if len(sys.argv) > 1:
+        query = sys.argv[1]
+        try:
+            res = es.get(index="controcurator", doc_type="article", id=query)
+            print(json.dumps(res['_source']))
+        except:
+            print(json.dumps({'status':'not_found'}))
+        
+    else:
+        res = es.search(index="controcurator", doc_type="article", body={"query": {"match_all": {}}})
+        print(json.dumps(res['hits']['hits']))
 

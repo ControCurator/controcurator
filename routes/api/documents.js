@@ -9,10 +9,14 @@ var parentDir = path.resolve(process.cwd());
 
 function getData() {
     return function(req, res, next) {
-        var id = req.params.id;
-        var task = req.params.task;
-        console.log('python '+parentDir+'/controllers/documents.py '+id)
-        var child = exec('python '+parentDir+'/controllers/documents.py', {maxBuffer: 1024 * 500}, function(err, stdout, stderr) {
+        if (req.params.id) {
+            var id = ' '+req.params.id;
+        }
+        else {
+            var id = '';
+        }
+        console.log('python '+parentDir+'/controllers/documents.py')
+        var child = exec('python '+parentDir+'/controllers/documents.py'+id, {maxBuffer: 1024 * 500}, function(err, stdout, stderr) {
             if (err) console.log(err);
             else {
                 //console.log(stdout);
