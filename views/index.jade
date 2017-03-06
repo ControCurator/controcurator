@@ -5,20 +5,12 @@ block content
         .ui.stacked.segment
             h2.ui.teal.header
                 .content Controversial Issues
-            - each anchor,i in results.controversial
+            - each article,i in results
                 div(style='display:block;')
-                    - var rounded = Math.round(anchor.confidence*100)/100
-                    a(href='/browse/anchor/'+results.keys[anchor.anchor], class='term neutral') #{anchor.anchor}
-                    div(style='float:right') #{rounded}
-
-
-        .ui.stacked.segment
-            h2.ui.teal.header
-                .content Non-Controversial Issues
-            - each anchor,i in results.noncontroversial
-                div(style='display:block;')
-                    - var rounded = Math.round(anchor.confidence*100)/100
-                    a(href='/browse/anchor/'+results.keys[anchor.anchor], class='term neutral') #{anchor.anchor}
-                    div(style='float:right') #{rounded}
-
-
+                    - var rounded = Math.round(Math.random()*100)
+                    a(href='/browse/anchor/'+article._id, class='' style='float:left') #{article._source.document.title}
+                    div(style='float:right')
+                        div(class="ui active progress" style="width:100px")
+                            div(class="bar" style-"width:#{rounded}px")
+                                div(class="progress") #{rounded}%
+                    p ... 
