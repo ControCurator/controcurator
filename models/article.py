@@ -3,7 +3,7 @@ import justext
 import string
 from pprint import pprint
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import DocType, Date, Text, Nested
+from elasticsearch_dsl import DocType, Date, Text, Nested, Keyword
 import re
 import pandas as pd
 
@@ -24,7 +24,7 @@ class Article(DocType):
 	url = Text(index='not_analyzed')
 	published = Date()
 	document = Nested(properties={"title":Text(index='analyzed'),"image":Text(index='not_analyzed'),"text":Text(index='analyzed'),"author":Text(index='analyzed')})
-	#features = Nested(properties={"quality":Nested(),"controversy":Nested()})
+	features = Nested(properties={"quality":Text(index='not_analyzed'),"controversy":Text(index='not_analyzed')})
 
 	class Meta:
 		index = 'controcurator'

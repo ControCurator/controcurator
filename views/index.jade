@@ -7,10 +7,12 @@ block content
                 .content Controversial Issues
             - each article,i in results
                 div(style='display:block;')
-                    - var rounded = Math.round(Math.random()*100)
-                    a(href='/browse/anchor/'+article._id, class='' style='float:left') #{article._source.document.title}
+                    - var rounded = Math.round(article._source.features.controversy * 100)
+                    - var red = Math.round(rounded * 2.2)
+                    - var green = 220 - red
                     div(style='float:right')
                         div(class="ui active progress" style="width:100px")
-                            div(class="bar" style-"width:#{rounded}px")
+                            div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
                                 div(class="progress") #{rounded}%
-                    p ... 
+                    a(href='/browse/anchor/'+article._id, style="padding-right:50px") #{article._source.document.title}
+                hr(style="clear:both")

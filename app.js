@@ -10,6 +10,10 @@ var index = require('./routes/index');
 var article = require('./routes/article');
 var anchor = require('./routes/anchor');
 var users = require('./routes/users');
+var api = require('./routes/api');
+var api_documents = require('./routes/api/documents');
+var api_anchors = require('./routes/api/anchors');
+var api_controversy = require('./routes/api/controversy');
 
 var app = express();
 
@@ -30,6 +34,10 @@ app.use('/', index);
 app.use('/anchor/:id', anchor);
 app.use('/article/:id', article);
 app.use('/users', users);
+app.use('/api/', api);
+app.use('/api/documents/:id?', api_documents);
+app.use('/api/anchors/:id?', api_anchors);
+app.use('/api/controversy/:input?', api_controversy);
 
 
 // catch 404 and forward to error handler

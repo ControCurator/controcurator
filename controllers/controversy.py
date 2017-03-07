@@ -1,9 +1,10 @@
 #!/bin/python
-import random # while real data lacks
-import json
-
 import sys
 import os
+
+
+import random # while real data lacks
+import json
 # KB: Added modules
 import numpy as np
 import pandas as pd
