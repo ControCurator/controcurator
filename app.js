@@ -61,17 +61,6 @@ if (app.get('env') === 'development') {
   });
 }
 
-var livereload = require('livereload');
-
-// This is different form http.createServer() or app.createServer()
-var reloadServer = livereload.createServer();
-
-reloadServer.config.exts.push("jade");  // Enable live reload for jade files
-reloadServer.watch(__dirname);  // Enable watch on complete app folder
-
-// You can also enable watch on multiple folders:
-reloadServer.watch([__dirname + "/js", __dirname + "/css"]);
-
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
