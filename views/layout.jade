@@ -2,7 +2,7 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/browse/stylesheets/style.css')
     link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css')
     script(src="//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js")
     script(src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js")
@@ -10,7 +10,7 @@ html
 
   body
     header.ui.fixed.inverted.menu: div.ui.container
-      a.item(href='/')= 'ControCurator'
+      a.item(href='/browse/')= 'ControCurator'
 
       div.ui.right.floated.right.aligned
         form(action='/browse/search/', method='GET')
