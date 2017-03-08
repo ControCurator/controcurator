@@ -37,12 +37,6 @@ class Article(DocType):
         'reply-to': String(),
         'id': String()
     })
-	features = Nested(properties={
-		"quality":Nested(),
-		"controversy":Nested(),
-		"topics":Nested(),
-		"author":Nested()
-		})
 
 	class Meta:
 		index = 'controcurator'

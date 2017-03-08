@@ -29,6 +29,9 @@ if __name__=='__main__':
         
     else:
         query = {
+                "_source" : {
+                "excludes" : ["comments"]
+                },
               "query": {
                 "match_all": {}
               },
