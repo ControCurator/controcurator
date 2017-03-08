@@ -9,8 +9,7 @@ var parentDir = path.resolve(process.cwd());
 
 function getData() {
     return function(req, res, next) {
-        console.log('python '+parentDir+'/controllers/documents.py')
-        var child = exec('python '+parentDir+'/controllers/documents.py', {maxBuffer: 1024 * 500}, function(err, stdout, stderr) {
+        var child = exec('python '+parentDir+'/controllers/barometer.py', {maxBuffer: 1024 * 500}, function(err, stdout, stderr) {
             if (err) console.log(err);
             else {
                 //console.log(stdout);

@@ -26,7 +26,8 @@ es = Elasticsearch(
     port=80)
 
 
-directory = '/Volumes/HDD/zips/controcurator_data_with_wiki/'
+#directory = '/Users/benjamin/Downloads/controcurator_data_with_wiki_2/'
+directory = '/Users/benjamin/Downloads/source/'
 
 files = os.listdir(directory)
 for file in files:
@@ -65,7 +66,7 @@ for file in files:
         article.source = "guardianJSON"
         article.published = pubdate
         article.document = {"title": webtitle, 'text': text}
-        article.features = {"controversy" : {"score" : random.random()}}
+        article.features = {"controversy" : {"random" : random.random()}}
         article.comments = comments
         try:
           article.save(index='controcurator',using=es)

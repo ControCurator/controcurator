@@ -28,6 +28,17 @@ if __name__=='__main__':
             print(json.dumps({'status':'not_found'}))
         
     else:
-        res = es.search(index="controcurator", doc_type="article", body={"query": {"match_all": {}}, "sort": [{ "features.controversy.score" : "desc" }]})
-        print(json.dumps(res['hits']['hits']))
-
+        query = {
+              "query": {
+                "match_all": {}
+              },
+              "sort": [
+                {
+                  "features.controversy.random": "desc"
+                }
+              ]
+            }
+        
+        res = es.search(index="controcurator", doc_type="article", body=query)
+        data = res['hits']['hits']
+        print(json.dumps(data))

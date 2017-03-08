@@ -22,7 +22,7 @@ es = Elasticsearch(
 if __name__=='__main__':
 
     '''
-        Given a set of documents, this return the controversy scores
+        Returns the top and bottom controversy articles
     '''
 
     if len(sys.argv) > 1:
@@ -45,10 +45,30 @@ if __name__=='__main__':
                 {
                   "features.controversy.random": "desc"
                 }
-              ]
+              ],
+              "size" : 5
             }
         
         res = es.search(index="controcurator", doc_type="article", body=query)
-        data = res['hits']['hits']
-        print(json.dumps(data))
+        top = res['hits']['hits']
+
+        query = {
+                "_source" : {
+                "excludes" : ["comments"]
+                },
+              "query": {
+                "match_all": {}
+              },
+              "sort": [
+                {
+                  "features.controversy.random": "asc"
+                }
+              ],
+              "size" : 5
+            }
+        
+        res = es.search(index="controcurator", doc_type="article", body=query)
+        bottom = res['hits']['hits']
+
+        print(json.dumps({'top':top,'bottom':bottom}))
 
