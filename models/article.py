@@ -3,7 +3,7 @@ import justext
 import string
 from pprint import pprint
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import DocType, Date, Text, Nested, Keyword
+from elasticsearch_dsl import DocType, Date, String, Nested
 import re
 import pandas as pd
 
@@ -18,24 +18,24 @@ class Article(DocType):
 
 	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 	_type = "document"
-	source = Text(index='not_analyzed')
-	type = Text(index='not_analyzed')
-	parent = Text(index='not_analyzed')
-	url = Text(index='not_analyzed')
+	source = String(index='not_analyzed')
+	type = String(index='not_analyzed')
+	parent = String(index='not_analyzed')
+	url = String(index='not_analyzed')
 	published = Date()
 	document = Nested(properties={
-		"title":Text(index='analyzed'),
-		"image":Text(index='not_analyzed'),
-		"text":Text(index='analyzed'),
-		"author":Text(index='analyzed')
+		"title":String(index='analyzed'),
+		"image":String(index='not_analyzed'),
+		"text":String(index='analyzed'),
+		"author":String(index='analyzed')
 		})
 	comments = Nested(properties={
-        'author-id': Text(index='not_analyzed'),
-        'author': Text(index='not_analyzed'),
+        'author-id': String(index='not_analyzed'),
+        'author': String(index='not_analyzed'),
         'timestamp': Date(),
-        'text' : Text(),
-        'reply-to': Text(),
-        'id': Text()
+        'text' : String(),
+        'reply-to': String(),
+        'id': String()
     })
 	features = Nested(properties={
 		"quality":Nested(),

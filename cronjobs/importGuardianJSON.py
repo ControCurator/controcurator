@@ -13,7 +13,7 @@ sys.path.insert(0,'../')
 from models import article
 from urllib import quote
 
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, ConnectionTimeout
 from models import Article
 from elasticsearch_dsl.connections import connections
 import random
@@ -26,7 +26,7 @@ es = Elasticsearch(
     port=80)
 
 
-directory = '/Users/benjamin/Downloads/controcurator_data_with_wiki_2/'
+directory = '/Volumes/HDD/zips/controcurator_data_with_wiki/'
 
 files = os.listdir(directory)
 for file in files:
@@ -67,7 +67,15 @@ for file in files:
         article.document = {"title": webtitle, 'text': text}
         article.features = {"controversy" : {"score" : random.random()}}
         article.comments = comments
-        article.save(index='controcurator',using=es)
+        try:
+          article.save(index='controcurator',using=es)
+        except ConnectionTimeout:
+          es = Elasticsearch(
+            ['http://controcurator.org/ess/'],
+            port=80)
+          article.save(index='controcurator', using=es)
+
+
 
 
 
