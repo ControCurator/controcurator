@@ -7,7 +7,7 @@ block content
                 .content Controversial Issues
             - each article,i in results
                 div(style='display:block;')
-                    - var rounded = Math.round(article._source.features.controversy * 100)
+                    - var rounded = Math.round(article._source.features.controversy.score * 100)
                     - var red = Math.round(rounded * 2.2)
                     - var green = 220 - red
                     div(style='float:right')

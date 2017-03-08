@@ -23,8 +23,26 @@ class Article(DocType):
 	parent = Text(index='not_analyzed')
 	url = Text(index='not_analyzed')
 	published = Date()
-	document = Nested(properties={"title":Text(index='analyzed'),"image":Text(index='not_analyzed'),"text":Text(index='analyzed'),"author":Text(index='analyzed')})
-	features = Nested(properties={"quality":Text(index='not_analyzed'),"controversy":Text(index='not_analyzed')})
+	document = Nested(properties={
+		"title":Text(index='analyzed'),
+		"image":Text(index='not_analyzed'),
+		"text":Text(index='analyzed'),
+		"author":Text(index='analyzed')
+		})
+	comments = Nested(properties={
+        'author-id': Text(index='not_analyzed'),
+        'author': Text(index='not_analyzed'),
+        'timestamp': Date(),
+        'text' : Text(),
+        'reply-to': Text(),
+        'id': Text()
+    })
+	features = Nested(properties={
+		"quality":Nested(),
+		"controversy":Nested(),
+		"topics":Nested(),
+		"author":Nested()
+		})
 
 	class Meta:
 		index = 'controcurator'
