@@ -1,18 +1,43 @@
 extends layout
 
 block content
-  .ui.middle.aligned.center.aligned
-        .ui.stacked.segment
-            h2.ui.teal.header
-                .content Controversial Issues
-            - each article,i in results
-                div(style='display:block;')
-                    - var rounded = Math.round(article._source.features.controversy.score * 100)
-                    - var red = Math.round(rounded * 2.2)
-                    - var green = 220 - red
-                    div(style='float:right')
-                        div(class="ui active progress" style="width:100px")
-                            div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
-                                div(class="progress") #{rounded}%
-                    a(href='/browse/anchor/'+article._id, style="padding-right:50px") #{article._source.document.title}
-                hr(style="clear:both")
+
+  .ui.grid
+      .ui.sixteen.wide.column
+            .ui.stacked.segment
+                iframe(style="border:0px;" src="http://controcurator.org/kibana/app/kibana#/visualize/create?embed=true&type=line&indexPattern=controcurator&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-6M,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(spy:(mode:(fill:!f,name:!n))),vis:(aggs:!((id:'1',params:(field:features.controversy.random),schema:metric,type:avg),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:published,interval:d,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!t,addTooltip:!f,defaultYExtents:!t,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!t,times:!(),yAxis:()),title:'Controversy',type:line))" height="300" width="100%")
+
+      .ui.eight.wide.column
+            .ui.stacked.segment
+                h2.ui.teal.header
+                    .content Controversial Issues
+                - each article,i in results.top
+                    div(style='display:block;')
+                        - var rounded = Math.round(article._source.features.controversy.random * 100)
+                        - var red = Math.round(rounded * 2.2)
+                        - var green = 220 - red
+                        div(style='float:right; margin-left:20px;')
+                            div(class="ui active progress" style="width:100px")
+                                div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
+                                    div(class="progress") #{rounded}%
+                        a(href='/browse/anchor/'+article._id, style="") #{article._source.document.title}
+                    hr(style="clear:both")
+
+      .ui.eight.wide.column
+            .ui.stacked.segment
+                h2.ui.teal.header
+                    .content Non-Controversial Issues
+                - each article,i in results.bottom
+                    div(style='display:block;')
+                        - var rounded = Math.round(article._source.features.controversy.random * 100)
+                        - var red = Math.round(rounded * 2.2)
+                        - var green = 220 - red
+                        div(style='float:right; margin-left:20px;')
+                            div(class="ui active progress" style="width:100px")
+                                div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
+                                    div(class="progress") #{rounded}%
+                        a(href='/browse/anchor/'+article._id, style="") #{article._source.document.title}
+                    hr(style="clear:both")
+
+
+            
