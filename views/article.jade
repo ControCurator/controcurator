@@ -2,25 +2,58 @@ extends layout
 
 block content
 
-	- if (!results.type)
-		h2.ui.ten.wide.column 
+	- if (notfound)
+		h1.ui.ten.wide.column 
 		| Article "<strong>#{id}</strong>" does not exist.
 	- else
 
 
 		.ui.grid
 			.ui.sixteen.wide.column
-				.ui.stacked.segment
-					h2.ui.teal.header
+				.ui.segment
+					h1.ui.dividing.header
 						.content
-							!= results.document.title
-					!= results.document.text
+							!= article.document.title
+					!= article.document.text
+					h5.ui.horizontal.divider.header
+						i.bar.chart.icon
+						| Document Properties
+					table.ui.definition.table
+						tbody
+							tr
+								td.two.wide.column Controversy
+								td
+									- var rounded = 45;//Math.round(article._source.features.controversy.random * 100)
+									- var green = Math.round(rounded * 2.2)
+									- var red = 220 - green
+									div.ui.active.progress(style="width:400px;margin:0px;")
+										div.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},0)")
+											div.progress #{rounded}%
+
+							tr
+								td.two.wide.column Document Quality
+								td 									
+									- var rounded = 65;//Math.round(article._source.features.controversy.random * 100)
+									- var green = Math.round(rounded * 2.2)
+									- var red = 220 - green
+									div.ui.active.progress(style="width:400px;margin:0px;")
+										div.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},0)")
+											div.progress #{rounded}%
+							tr
+								td.two.wide.column Topics
+								td
+									a.ui.tag.label Trump
+										.detail 95%
+									a.ui.tag.label Elections
+										.detail 70%
+									a.ui.tag.label United States
+										.detail 55%
 
 			.ui.eight.wide.column
-				.ui.stacked.segment
-					h2.ui.teal.header
-						.content Negative Comments
-					- each comment,i in results.comments
+				.ui.segment
+					h1.ui.dividing.header
+						.content Negative negative
+					- each comment,i in negative
 						div(style='display:block;')
 							- var rounded = 10;//Math.round(article._source.features.controversy.random * 100)
 							- var green = Math.round(rounded * 2.2)
@@ -31,15 +64,16 @@ block content
 										div(class="progress") #{rounded}%
 							b
 								!= comment.author
+								| : 
 							!= comment.text
 						hr(style="clear:both")
 
 
 			.ui.eight.wide.column
-				.ui.stacked.segment
-					h2.ui.teal.header
+				.ui.segment
+					h1.ui.dividing.header
 						.content Positive Comments
-					- each comment,i in results.comments
+					- each comment,i in positive
 						div(style='display:block;')
 							- var rounded = 90;//Math.round(article._source.features.controversy.random * 100)
 							- var green = Math.round(rounded * 2.2)
@@ -50,6 +84,7 @@ block content
 										div(class="progress") #{rounded}%
 							b
 								!= comment.author
+								| : 
 							!= comment.text
 						hr(style="clear:both")
 
@@ -58,4 +93,4 @@ block content
 
 
 
-		include annotation
+			include annotation
