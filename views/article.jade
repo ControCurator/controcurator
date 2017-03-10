@@ -2,16 +2,60 @@ extends layout
 
 block content
 
-	- if (!results._id)
+	- if (!results.type)
 		h2.ui.ten.wide.column 
 		| Article "<strong>#{id}</strong>" does not exist.
 	- else
 
-		div.ui.segment
-			h1.ui.dividing.header: != results.title
-			div.ui.items
-				div.item
-					div.content
-						!= results.html
+
+		.ui.grid
+			.ui.sixteen.wide.column
+				.ui.stacked.segment
+					h2.ui.teal.header
+						.content
+							!= results.document.title
+					!= results.document.text
+
+			.ui.eight.wide.column
+				.ui.stacked.segment
+					h2.ui.teal.header
+						.content Negative Comments
+					- each comment,i in results.comments
+						div(style='display:block;')
+							- var rounded = 10;//Math.round(article._source.features.controversy.random * 100)
+							- var green = Math.round(rounded * 2.2)
+							- var red = 220 - green
+							div(style='float:right; margin-left:20px;')
+								div(class="ui active progress" style="width:100px")
+									div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
+										div(class="progress") #{rounded}%
+							b
+								!= comment.author
+							!= comment.text
+						hr(style="clear:both")
+
+
+			.ui.eight.wide.column
+				.ui.stacked.segment
+					h2.ui.teal.header
+						.content Positive Comments
+					- each comment,i in results.comments
+						div(style='display:block;')
+							- var rounded = 90;//Math.round(article._source.features.controversy.random * 100)
+							- var green = Math.round(rounded * 2.2)
+							- var red = 220 - green
+							div(style='float:right; margin-left:20px;')
+								div(class="ui active progress" style="width:100px")
+									div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
+										div(class="progress") #{rounded}%
+							b
+								!= comment.author
+							!= comment.text
+						hr(style="clear:both")
+
+
+
+
+
 
 		include annotation
