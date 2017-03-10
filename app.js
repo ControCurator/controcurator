@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var article = require('./routes/article');
 var anchor = require('./routes/anchor');
+var search = require('./routes/search');
 var users = require('./routes/users');
 var api = require('./routes/api');
 var api_documents = require('./routes/api/documents');
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/anchor/:id', anchor);
+app.use('/search/:id?', search);
 app.use('/article/:id', article);
 app.use('/users', users);
 app.use('/api/', api);

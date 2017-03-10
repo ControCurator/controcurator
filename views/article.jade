@@ -42,17 +42,17 @@ block content
 							tr
 								td.two.wide.column Topics
 								td
-									a.ui.tag.label Trump
+									a.ui.tag.label(href='/browse/search/trump') Trump
 										.detail 95%
-									a.ui.tag.label Elections
+									a.ui.tag.label(href='/browse/search/elections') Elections
 										.detail 70%
-									a.ui.tag.label United States
+									a.ui.tag.label(href='/browse/search/united+states') United States
 										.detail 55%
 
 			.ui.eight.wide.column
 				.ui.segment
 					h1.ui.dividing.header
-						.content Negative negative
+						.content Negative Comments
 					- each comment,i in negative
 						div(style='display:block;')
 							- var rounded = 10;//Math.round(article._source.features.controversy.random * 100)
