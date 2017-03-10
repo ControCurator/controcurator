@@ -27,7 +27,9 @@ es = Elasticsearch(
 
 
 #directory = '/Users/benjamin/Downloads/controcurator_data_with_wiki_2/'
-directory = '/Users/benjamin/Downloads/source/'
+#directory = '/Users/benjamin/Downloads/source/'
+directory = '/Volumes/HDD/zips/source/'
+Article.init()
 
 files = os.listdir(directory)
 for file in files:
@@ -53,7 +55,10 @@ for file in files:
       section = data['response']['content']['sectionId']
       pubdate = data['response']['content']['webPublicationDate']
       comments = data['response']['content']['blocks']['comments']
-      print len(comments)
+      try:
+        print len(comments)
+      except TypeError:
+        comments = {}
       if len(comments) < 1000:
         html = data['response']['content']['blocks']['body'][0]['bodyHtml'].decode('ascii', 'ignore')
         paragraphs = html.split('</p>')
