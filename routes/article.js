@@ -5,29 +5,32 @@ var router = express.Router({mergeParams: true});
 var exec = require('child_process').exec;
 var path = require('path');
 var parentDir = path.resolve(process.cwd());
+var elasticsearch = require('elasticsearch');
+var client = new elasticsearch.Client({
+  host: 'http://controcurator.org/ess'
+});
 
-function loadSearch() {
-    return function(req, res, next) {
-    	
-        var id = req.params.id;
+router.get('/', function(req, res, next) {
 
-        var child = exec('python '+parentDir+'/controllers/documents.py '+id, function(err, stdout, stderr) {
-            if (err) console.log(err);
-            else {
+    // article
+    var id = req.params.id;
+    client.get({
+      index: 'controcurator',
+      type: 'article',
+      id: id
+    }).then(function (resp) {
+        //console.log(resp);
+        var article = resp._source;
+        var positive = article.comments;
+        var negative = article.comments;
 
-                var data = JSON.parse(stdout);
-                req.data = data;
-                console.trace(data)
-                next();
-            }
-        });
+        res.render('article', {'id' : id, 'article': article, 'positive' : positive, 'negative' : negative});
 
-    };
-}
+    }, function (err) {
+        console.trace(err.message);
+        res.render('article', {'id' : id, 'notfound':1});
+    });
 
-
-router.get('/', loadSearch(), function(req, res, next) {
-    res.render('article', { 'title':'ControCurator', 'id': req.params.id, results: req.data});
 });
 
 module.exports = router;

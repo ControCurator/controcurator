@@ -2,25 +2,25 @@ extends layout
 
 block content
 
-	- if (!results.type)
-		h2.ui.ten.wide.column 
+	- if (notfound)
+		h1.ui.ten.wide.column 
 		| Article "<strong>#{id}</strong>" does not exist.
 	- else
 
 
 		.ui.grid
 			.ui.sixteen.wide.column
-				.ui.stacked.segment
-					h2.ui.teal.header
+				.ui.segment
+					h1.ui.dividing.header
 						.content
-							!= results.document.title
-					!= results.document.text
+							!= article.document.title
+					!= article.document.text
 
 			.ui.eight.wide.column
-				.ui.stacked.segment
-					h2.ui.teal.header
-						.content Negative Comments
-					- each comment,i in results.comments
+				.ui.segment
+					h1.ui.dividing.header
+						.content Negative negative
+					- each comment,i in negative
 						div(style='display:block;')
 							- var rounded = 10;//Math.round(article._source.features.controversy.random * 100)
 							- var green = Math.round(rounded * 2.2)
@@ -31,15 +31,16 @@ block content
 										div(class="progress") #{rounded}%
 							b
 								!= comment.author
+								| : 
 							!= comment.text
 						hr(style="clear:both")
 
 
 			.ui.eight.wide.column
-				.ui.stacked.segment
-					h2.ui.teal.header
+				.ui.segment
+					h1.ui.dividing.header
 						.content Positive Comments
-					- each comment,i in results.comments
+					- each comment,i in positive
 						div(style='display:block;')
 							- var rounded = 90;//Math.round(article._source.features.controversy.random * 100)
 							- var green = Math.round(rounded * 2.2)
@@ -50,6 +51,7 @@ block content
 										div(class="progress") #{rounded}%
 							b
 								!= comment.author
+								| : 
 							!= comment.text
 						hr(style="clear:both")
 
@@ -58,4 +60,4 @@ block content
 
 
 
-		include annotation
+			include annotation

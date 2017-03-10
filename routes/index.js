@@ -5,24 +5,73 @@ var router = express.Router();
 var exec = require('child_process').exec;
 var path = require('path');
 var parentDir = path.resolve(process.cwd());
+var elasticsearch = require('elasticsearch');
+var client = new elasticsearch.Client({
+  host: 'http://controcurator.org/ess'
+});
 
+router.get('/', function(req, res, next) {
 
-function getData() {
-    return function(req, res, next) {
-        var child = exec('python '+parentDir+'/controllers/barometer.py', {maxBuffer: 1024 * 500}, function(err, stdout, stderr) {
-            if (err) console.log(err);
-            else {
-                //console.log(stdout);
-                req.data = JSON.parse(stdout);
-                //console.log(req.data.controversial);
-                next();
+    client.search({
+      index: 'controcurator',
+      type: 'article',
+      body: 
+      {
+        "_source": {
+          "excludes": [
+            "comments"
+          ]
+        },
+        "query": {
+          "match_all": {}
+        },
+        "size": 5,
+        "sort": {
+          "features.controversy.random": "desc"
+        }
+      }
+    }).then(function (resp) {
+        var top = resp.hits.hits;
+
+        
+        client.search({
+          index: 'controcurator',
+          type: 'article',
+          body: 
+          {
+            "_source": {
+              "excludes": [
+                "comments"
+              ]
+            },
+            "query": {
+              "match_all": {}
+            },
+            "size": 5,
+            "sort": {
+              "features.controversy.random": "asc"
             }
-        });
-    };
-}
+          }
+        }).then(function (resp) {
+            var bottom = resp.hits.hits;
 
-router.get('/', getData(), function(req, res, next) {
-    res.render('index', { 'title':'ControCurator', results: req.data});
+            
+
+
+
+            res.render('index', { 'title':'ControCurator', 'top': top, 'bottom': bottom});
+
+
+        }, function (err) {
+            console.trace(err.message);
+        });
+
+
+    }, function (err) {
+        console.trace(err.message);
+    });
+
+  
 });
 
 module.exports = router;
