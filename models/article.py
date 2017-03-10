@@ -6,12 +6,20 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import DocType, Date, String, Nested
 import re
 import pandas as pd
+from esengine import Document
 
 es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 
 
 
 # Articles are any kind of document
+
+class getArticleMod(Document):
+	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
+	_doctype = "article"
+	_index = "controcurator"
+	url = String(index='not_analyzed')
+
 
 
 class Article(DocType):
