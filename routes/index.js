@@ -23,11 +23,21 @@ router.get('/', function(req, res, next) {
           ]
         },
         "query": {
-          "match_all": {}
+        "bool": {
+          "must": [
+            {
+              "range": {
+                "features.controversy.kasparfier": {
+                  "gt": "0"
+                }
+              }
+            }
+          ]
+        }
         },
         "size": 5,
         "sort": {
-          "features.controversy.random": "desc"
+          "features.controversy.kasparfier": "desc"
         }
       }
     }).then(function (resp) {
@@ -39,24 +49,31 @@ router.get('/', function(req, res, next) {
           type: 'article',
           body: 
           {
-            "_source": {
-              "excludes": [
-                "comments"
-              ]
-            },
-            "query": {
-              "match_all": {}
-            },
-            "size": 5,
-            "sort": {
-              "features.controversy.random": "asc"
-            }
+          "_source": {
+            "excludes": [
+              "comments"
+            ]
+          },
+          "query": {
+          "bool": {
+            "must": [
+              {
+                "range": {
+                  "features.controversy.kasparfier": {
+                    "gt": "0"
+                  }
+                }
+              }
+            ]
           }
+          },
+          "size": 5,
+          "sort": {
+            "features.controversy.kasparfier": "asc"
+          }
+        }
         }).then(function (resp) {
             var bottom = resp.hits.hits;
-
-            
-
 
 
             res.render('index', { 'title':'ControCurator', 'top': top, 'bottom': bottom});

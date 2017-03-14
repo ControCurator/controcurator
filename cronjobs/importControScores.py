@@ -26,7 +26,7 @@ foundcount = 0;
 
 for index in actualjson:
 
-    insertscore = actualjson[index][0]
+    insertscore = actualjson[index][1]
 
 
     query = {
