@@ -93,7 +93,7 @@ def get_article_children(article, article_id, tries = MAXTRIES):
 		for i in child:
 			artChildren += 1
 			data_dict[i] = child[i]
-		data_dict['parent'] = article_id
+		data_dict['parent'] = article
 		data_dict['retrieved'] = time
 		data_dict['source'] = SOURCE
 		pprint(data_dict)

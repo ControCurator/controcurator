@@ -11,7 +11,6 @@ var client = new elasticsearch.Client({
 });
 
 router.get('/', function(req, res, next) {
-
     // article
     var id = req.params.id;
     client.get({
@@ -21,8 +20,24 @@ router.get('/', function(req, res, next) {
     }).then(function (resp) {
         //console.log(resp);
         var article = resp._source;
-        var positive = article.comments;
-        var negative = article.comments;
+
+        var positive = article.comments.slice(0);
+        positive = positive.filter(function(a) {
+            return a.sentiment.sentiment > 0;
+        });
+        positive.sort(function(a,b) {
+            return b.sentiment.sentiment - a.sentiment.sentiment;
+        });
+        positive = positive.slice(0, 5);
+
+        var negative = article.comments.slice(0);
+        negative = negative.filter(function(a) {
+            return a.sentiment.sentiment < 0;
+        });
+        negative.sort(function(a,b) {
+            return a.sentiment.sentiment - b.sentiment.sentiment;
+        });
+        negative = negative.slice(0, 5);
 
         res.render('article', {'id' : id, 'article': article, 'positive' : positive, 'negative' : negative});
 

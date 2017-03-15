@@ -14,7 +14,8 @@ block content
 					h1.ui.dividing.header
 						.content
 							!= article.document.title
-					!= article.document.text
+					div(style="color: #333; font-family: Georgia; line-height: 1.625rem;")
+						!= article.document.text
 					h5.ui.horizontal.divider.header
 						i.bar.chart.icon
 						| Document Properties
@@ -23,7 +24,7 @@ block content
 							tr
 								td.two.wide.column Controversy
 								td
-									- var rounded = 45;//Math.round(article._source.features.controversy.random * 100)
+									- var rounded = Math.round(article.features.controversy.random * 100)
 									- var green = Math.round(rounded * 2.2)
 									- var red = 220 - green
 									div.ui.active.progress(style="width:400px;margin:0px;")
@@ -33,7 +34,7 @@ block content
 							tr
 								td.two.wide.column Document Quality
 								td 									
-									- var rounded = 65;//Math.round(article._source.features.controversy.random * 100)
+									- var rounded = 100-Math.round(article.features.controversy.random * 100)
 									- var green = Math.round(rounded * 2.2)
 									- var red = 220 - green
 									div.ui.active.progress(style="width:400px;margin:0px;")
@@ -55,17 +56,32 @@ block content
 						.content Negative Comments
 					- each comment,i in negative
 						div(style='display:block;')
-							- var rounded = 10;//Math.round(article._source.features.controversy.random * 100)
-							- var green = Math.round(rounded * 2.2)
-							- var red = 220 - green
-							div(style='float:right; margin-left:20px;')
-								div(class="ui active progress" style="width:100px")
-									div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
-										div(class="progress") #{rounded}%
+							- var width = 80
+							- var negativity = Math.round(comment.sentiment.negativity / comment.sentiment.words * width)
+							- var positivity = Math.round(comment.sentiment.positivity / comment.sentiment.words * width)
+							- var sentiment = Math.round(comment.sentiment.sentiment * 100)/100
+							- var leftoffset = width - negativity;
+							- var rightoffset = width - positivity;
+							- var posgreen = 125 + Math.round(comment.sentiment.positivity / comment.sentiment.words * 125)
+							- var posred = 125 - Math.round(comment.sentiment.positivity / comment.sentiment.words * 125)
+							- var neggreen = 125 - Math.round(comment.sentiment.negativity / comment.sentiment.words * 125)
+							- var negred = 125 + Math.round(comment.sentiment.negativity / comment.sentiment.words * 125)
+							div(style='float: right; border: 1px solid rgba(34,36,38,.15); background: rgba(0,0,0,.03); padding: 6px; border-radius: .28571429rem; margin: 10px 0 20px 20px;font-family: Lato,Arial,Helvetica,sans-serif;')
+								div(style="text-align:center;")
+									b
+										| Sentiment
+									
+								div(class="ui progress" style="margin: 6px 0 6px 0;")
+									div(class="bar" style="float:left;width:#{negativity}px; background-color: rgb(#{negred},#{neggreen},0); margin-left:#{leftoffset}px;min-width:0px;border-right:1px solid #666;")
+									div(class="bar" style="float:left;width:#{positivity}px; background-color: rgb(#{posred},#{posgreen},0);  margin-right:#{rightoffset}px;min-width:0px;border-left:1px solid #666;")
+									div(style="clear:both;")
+								div(style="text-align:center;font-weight:bold;font-size:14px;")
+									!= sentiment
 							b
 								!= comment.author
 								| : 
-							!= comment.text
+							div(style="color: #333; font-family: Georgia; line-height: 1.625rem;")
+								!= comment.text
 						hr(style="clear:both")
 
 
@@ -75,17 +91,32 @@ block content
 						.content Positive Comments
 					- each comment,i in positive
 						div(style='display:block;')
-							- var rounded = 90;//Math.round(article._source.features.controversy.random * 100)
-							- var green = Math.round(rounded * 2.2)
-							- var red = 220 - green
-							div(style='float:right; margin-left:20px;')
-								div(class="ui active progress" style="width:100px")
-									div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
-										div(class="progress") #{rounded}%
+							- var width = 80
+							- var negativity = Math.round(comment.sentiment.negativity / comment.sentiment.words * width)
+							- var positivity = Math.round(comment.sentiment.positivity / comment.sentiment.words * width)
+							- var sentiment = Math.round(comment.sentiment.sentiment * 100)/100
+							- var leftoffset = width - negativity;
+							- var rightoffset = width - positivity;
+							- var posgreen = 125 + Math.round(comment.sentiment.positivity / comment.sentiment.words * 125)
+							- var posred = 125 - Math.round(comment.sentiment.positivity / comment.sentiment.words * 125)
+							- var neggreen = 125 - Math.round(comment.sentiment.negativity / comment.sentiment.words * 125)
+							- var negred = 125 + Math.round(comment.sentiment.negativity / comment.sentiment.words * 125)
+							div(style='float: right; border: 1px solid rgba(34,36,38,.15); background: rgba(0,0,0,.03); padding: 6px; border-radius: .28571429rem; margin: 10px 0 20px 20px;font-family: Lato,Arial,Helvetica,sans-serif;')
+								div(style="text-align:center;")
+									b
+										| Sentiment
+									
+								div(class="ui progress" style="margin: 6px 0 6px 0;")
+									div(class="bar" style="float:left;width:#{negativity}px; background-color: rgb(#{negred},#{neggreen},0); margin-left:#{leftoffset}px;min-width:0px;border-right:1px solid #666;")
+									div(class="bar" style="float:left;width:#{positivity}px; background-color: rgb(#{posred},#{posgreen},0);  margin-right:#{rightoffset}px;min-width:0px;border-left:1px solid #666;")
+									div(style="clear:both;")
+								div(style="text-align:center;font-weight:bold;font-size:14px;")
+									!= sentiment
 							b
 								!= comment.author
 								| : 
-							!= comment.text
+							div(style="color: #333; font-family: Georgia; line-height: 1.625rem;")
+								!= comment.text
 						hr(style="clear:both")
 
 
