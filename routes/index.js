@@ -76,7 +76,7 @@ router.get('/', function(req, res, next) {
             var bottom = resp.hits.hits;
 
 
-            res.render('index', { 'title':'ControCurator', 'top': top, 'bottom': bottom});
+            res.render('index', {'top': top, 'bottom': bottom});
 
 
         }, function (err) {

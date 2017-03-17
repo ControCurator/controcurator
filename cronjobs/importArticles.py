@@ -44,12 +44,11 @@ query = {"query":
                         }
                     }
               }
-    ,"from": 0,"size":10}
+    ,"from": 0,"size":100}
 response = es.search(index="crowdynews", body=query)
 
 getArticleMod.init()
 Article.init()
-urlprefix = str('/v1/related/controcurator?q=')
 
 gs = GuardianScraper()
 
@@ -94,6 +93,15 @@ for resp in response['hits']['hits']:
             article.published = pubdate
             article.document = {"title": webtitle, 'text': text}
             article.features = {"controversy": {"random": random.random()}}
+            
+
+            for comment in comments:
+                print comment
+                break
+                #comments[comment]['sentiment'] = SentimentExtractor.getSentiment(comment['text'])
+
+
+
             article.comments = comments
             try:
                 article.save(index='controcurator', using=es)
