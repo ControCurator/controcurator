@@ -6,7 +6,7 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import DocType, Date, String, Nested
 import re
 import pandas as pd
-from esengine import Document
+from esengine import Document, ArrayField, StringField, ObjectField
 
 es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
 
@@ -20,7 +20,20 @@ class getArticleMod(Document):
 	_index = "controcurator"
 	url = String(index='not_analyzed')
 
+class markProcessed(Document):
+	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
+	_doctype = "twitter"
+	_index = "crowdynews"
+	entities = ObjectField()
+	processed = StringField()
 
+class updateParent(Document):
+	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
+	_doctype = "twitter"
+	_index = "crowdynews"
+	parent = ObjectField(properties={
+		"url":String(index='not_analyzed')
+	})
 
 class Article(DocType):
 
