@@ -38,7 +38,7 @@ class updateParent(Document):
 class Article(DocType):
 
 	_es = Elasticsearch(['http://controcurator.org/ess/'], port=80)
-	_type = "document"
+	_type = "article"
 	source = String(index='not_analyzed')
 	type = String(index='not_analyzed')
 	parent = String(index='not_analyzed')

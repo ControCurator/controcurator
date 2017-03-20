@@ -13,42 +13,46 @@ block content
 				.ui.segment
 					h1.ui.dividing.header
 						.content
-							!= article.document.title
+							| Article
 					div(style="color: #333; font-family: Georgia; line-height: 1.625rem;")
+						h3.ui.blue.header
+							!= article.document.title
+							.sub.header
+								| Published in #{article.source} on #{article.published}
 						!= article.document.text
+
 					h5.ui.horizontal.divider.header
 						i.bar.chart.icon
-						| Document Properties
+						| Article Properties
 					table.ui.definition.table
 						tbody
 							tr
 								td.two.wide.column Controversy
 								td
-									- var rounded = Math.round(article.features.controversy.random * 100)
-									- var green = Math.round(rounded * 2.2)
-									- var red = 220 - green
+									- var rounded = Math.round(article.features.controversy.value * 100)
+									- var red = Math.round(rounded * 2.2)
+									- var green = 220 - red
 									div.ui.active.progress(style="width:400px;margin:0px;")
 										div.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},0)")
 											div.progress #{rounded}%
 
-							tr
-								td.two.wide.column Document Quality
-								td 									
-									- var rounded = 100-Math.round(article.features.controversy.random * 100)
-									- var green = Math.round(rounded * 2.2)
-									- var red = 220 - green
-									div.ui.active.progress(style="width:400px;margin:0px;")
-										div.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},0)")
-											div.progress #{rounded}%
-							tr
-								td.two.wide.column Topics
-								td
-									a.ui.tag.label(href='/browse/search/trump') Trump
-										.detail 95%
-									a.ui.tag.label(href='/browse/search/elections') Elections
-										.detail 70%
-									a.ui.tag.label(href='/browse/search/united+states') United States
-										.detail 55%
+							if article.features.quality
+								tr
+									td.two.wide.column Document Quality
+									td 									
+										- var rounded = 100-Math.round(article.features.controversy.value * 100)
+										- var green = Math.round(rounded * 2.2)
+										- var red = 220 - green
+										div.ui.active.progress(style="width:400px;margin:0px;")
+											div.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},0)")
+												div.progress #{rounded}%
+							if article.features.topics
+								tr
+									td.two.wide.column Topics
+									td
+										- each topic in article.features.topics
+											a.ui.tag.label(href='/browse/search/trump',style='text-transform: capitalize;') #{topic.name}
+												.detail #{topic.value}
 
 			.ui.eight.wide.column
 				.ui.segment

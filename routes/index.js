@@ -27,7 +27,7 @@ router.get('/', function(req, res, next) {
           "must": [
             {
               "range": {
-                "features.controversy.kasparfier": {
+                "features.controversy.value": {
                   "gt": "0"
                 }
               }
@@ -35,9 +35,9 @@ router.get('/', function(req, res, next) {
           ]
         }
         },
-        "size": 5,
+        "size": 10,
         "sort": {
-          "features.controversy.kasparfier": "desc"
+          "features.controversy.value": "desc"
         }
       }
     }).then(function (resp) {
@@ -59,7 +59,7 @@ router.get('/', function(req, res, next) {
             "must": [
               {
                 "range": {
-                  "features.controversy.kasparfier": {
+                  "features.controversy.value": {
                     "gt": "0"
                   }
                 }
@@ -67,9 +67,9 @@ router.get('/', function(req, res, next) {
             ]
           }
           },
-          "size": 5,
+          "size": 10,
           "sort": {
-            "features.controversy.kasparfier": "asc"
+            "features.controversy.value": "asc"
           }
         }
         }).then(function (resp) {

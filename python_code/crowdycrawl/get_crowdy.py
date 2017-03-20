@@ -8,9 +8,6 @@ import datetime
 import time
 from collections import Counter
 from pprint import pprint
-import sys
-import os
-from models.articles.crowdynews import *
 
 MAXTRIES = 5
 
@@ -57,9 +54,6 @@ def get_articles(tries = MAXTRIES):
 		article['retrieved'] =	now()
 		article['source'] =	SOURCE
 		res = client.index('crowdynews', id=article_id, doc_type=article['service'],body=article)
-		
-		savedArticle = CrowdyNews.create(article)
-		savedArticle.save()
 
 		if(res['created'] == True):
 			global ARTCOUNTNEW
@@ -106,10 +100,6 @@ def get_article_children(article, article_id, tries = MAXTRIES):
 		}
 		bulk_data.append(op_dict)
 		bulk_data.append(data_dict)
-
-		savedArticle = CrowdyNews.create(data_dict)
-		savedArticle.save()
-
 
 	res = client.bulk(index = INDEX, body = bulk_data)
 	#pprint(res)
@@ -176,9 +166,6 @@ def get_socchild(socmed, tries = MAXTRIES):
 		child['retrieved'] = now()
 		child['source'] = SOURCE
 		res = client.index(INDEX, id=child.get('id',None), doc_type=child.get('service','unknown'),body=child)
-
-		savedArticle = CrowdyNews.create(socmed)
-		savedArticle.save()
 
 		print('retrieved '+child.get('service','unknown')+' status: '+str(res['created'])+' id: '+child.get('id',None))
 

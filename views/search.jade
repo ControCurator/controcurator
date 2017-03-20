@@ -6,14 +6,19 @@ block content
 
 		.ui.sixteen.wide.column
 			.ui.segment
+				h1.ui.header Searching for: #{search}
+				
+
+		.ui.sixteen.wide.column
+			.ui.segment
 				h2.ui.teal.header
 					.content Controversy over time
-				iframe(style="border:0px;" src="http://controcurator.org/kibana/app/kibana#/visualize/create?embed=true&type=line&indexPattern=controcurator&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-6M,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(spy:(mode:(fill:!f,name:!n))),vis:(aggs:!((id:'1',params:(field:features.controversy.value),schema:metric,type:avg),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:published,interval:d,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!t,addTooltip:!f,defaultYExtents:!t,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!t,times:!(),yAxis:()),title:'Controversy',type:line))" height="300" width="100%")
+				iframe(style="border:0px;" src="#{iframe}" height="300" width="100%")
 
 		.ui.eight.wide.column
 			.ui.segment
 				h2.ui.teal.header
-					.content Most Controversial Issues
+					.content Most Controversial Issues on "#{search}"
 				- each article,i in top
 					div(style='display:block;')
 						- var rounded = Math.round(article._source.features.controversy.value * 100)
@@ -26,10 +31,11 @@ block content
 						a(href='/browse/article/'+article._id, style="") #{article._source.document.title}
 					hr(style="clear:both")
 
+
 		.ui.eight.wide.column
 			.ui.segment
 				h2.ui.teal.header
-					.content Least Controversial Issues
+					.content Least Controversial Issues on "#{search}"
 				- each article,i in bottom
 					div(style='display:block;')
 						- var rounded = Math.round(article._source.features.controversy.value * 100)
@@ -42,7 +48,8 @@ block content
 						a(href='/browse/article/'+article._id, style="") #{article._source.document.title}
 					hr(style="clear:both")
 
-		.ui.sixteen.wide.column.right.aligned
-			a.ui.right.labeled.icon.primary.button(href='/browse/article/'+top[0]._id)
-				i.right.arrow.icon
-				| Please help us by annotating an article
+		if bottom[0]
+			.ui.sixteen.wide.column.right.aligned
+				a.ui.right.labeled.icon.primary.button(href='/browse/article/'+bottom[0]._id)
+					i.right.arrow.icon
+					| Please help us by annotating an article

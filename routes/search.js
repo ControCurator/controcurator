@@ -8,6 +8,11 @@ var parentDir = path.resolve(process.cwd());
 
 router.get('/', function(req, res, next) {
 
+  var iframe = "http://controcurator.org/kibana/app/kibana#/visualize/create?embed=true&type=line&indexPattern=controcurator&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-6M,mode:quick,to:now))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'"+req.params.id+"')),uiState:(spy:(mode:(fill:!f,name:!n))),vis:(aggs:!((id:'1',params:(field:features.controversy.value),schema:metric,type:avg),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:published,interval:d,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!t,addTooltip:!f,defaultYExtents:!t,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!t,times:!(),yAxis:()),title:'Controversy',type:line))"
+  if(req.query.id) {
+    req.params.id = req.query.id;
+  }
+
   var topquery = {
             "_source": {
               "excludes": [
@@ -15,25 +20,38 @@ router.get('/', function(req, res, next) {
               ]
             },
             "query": {
-              "nested": {
-                "path": "document",
-                "score_mode": "avg",
-                "query": {
-                  "bool": {
-                    "must": [
-                      {
-                        "match": {
-                          "document.title": req.params.id
+              "bool": {
+                "must": [
+                {
+                    "nested": {
+                      "path": "document",
+                      "score_mode": "avg",
+                      "query": {
+                        "bool": {
+                          "must": [
+                            {
+                              "match": {
+                                "document.title": req.params.id
+                              }
+                            }
+                          ]
                         }
                       }
-                    ]
                   }
-                }
+                },
+                  {
+                    "range": {
+                      "features.controversy.value": {
+                        "gte": "0.5"
+                      }
+                    }
+                  }
+                ]
               }
             },
-            "size": 5,
+            "size": 10,
             "sort": {
-              "features.controversy.random": "asc"
+              "features.controversy.value": "desc"
             }
           }
 
@@ -45,25 +63,39 @@ router.get('/', function(req, res, next) {
               ]
             },
             "query": {
-              "nested": {
-                "path": "document",
-                "score_mode": "avg",
-                "query": {
-                  "bool": {
-                    "must": [
-                      {
-                        "match": {
-                          "document.title": req.params.id
+              "bool": {
+                "must": [
+                {
+                    "nested": {
+                      "path": "document",
+                      "score_mode": "avg",
+                      "query": {
+                        "bool": {
+                          "must": [
+                            {
+                              "match": {
+                                "document.title": req.params.id
+                              }
+                            }
+                          ]
                         }
                       }
-                    ]
                   }
-                }
+                },
+                  {
+                    "range": {
+                      "features.controversy.value": {
+                        "gt": "0",
+                        "lt": "0.5"
+                      }
+                    }
+                  }
+                ]
               }
             },
-            "size": 5,
+            "size": 10,
             "sort": {
-              "features.controversy.random": "desc"
+              "features.controversy.value": "asc"
             }
           }
 
@@ -81,7 +113,7 @@ router.get('/', function(req, res, next) {
         if (!error && response.statusCode == 200) {
           var bottom = body.hits.hits;
         
-          res.render('index', { 'top': top, 'bottom': bottom});
+          res.render('search', { 'top': top, 'bottom': bottom,'search':req.params.id, 'iframe':iframe});
 
         }
       });

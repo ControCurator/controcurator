@@ -17,7 +17,7 @@ es = Elasticsearch(
     port=80)
 
 
-importjson = open('/Volumes/HDD/zips/id_proba_mapping.json')
+importjson = open('/Users/benjamin/Downloads/id_proba_mapping.json')
 
 actualjson = json.load(importjson)
 
@@ -49,7 +49,7 @@ for index in actualjson:
         notfoundcount += 1
     else:
         foundcount += 1
-        updateModel.get(id=index).update(features={'controversy':{'kasparfier':insertscore}})
+        updateModel.get(id=index).update(features={'controversy':{'kasparfier':insertscore,'value':insertscore}})
 
 
 print "Found: "+str(foundcount)+ " -- NOT found: "+str(notfoundcount)

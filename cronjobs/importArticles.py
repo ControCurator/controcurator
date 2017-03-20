@@ -83,7 +83,7 @@ for resp in response['hits']['hits']:
             html = guardianresult['response']['content']['blocks']['body'][0]['bodyHtml'].decode('ascii', 'ignore')
             paragraphs = html.split('</p>')
             stripHtml = lambda text: re.compile('(?!<p>|<br>|<br />)<.*?>').sub('', text)
-            text = u'</p>'.join([stripHtml(p) for p in paragraphs[:2]]) + '</p>'
+            text = u'</p>'.join([stripHtml(p) for p in paragraphs]) + '</p>'
 
             article = Article(meta={'id': id})
             print id
@@ -104,12 +104,12 @@ for resp in response['hits']['hits']:
 
             article.comments = comments
             try:
-                article.save(index='controcurator', using=es)
+                article.save(index='controcurator')
             except ConnectionTimeout:
                 es = Elasticsearch(
                     ['http://controcurator.org/ess/'],
                     port=80)
-                article.save(index='controcurator', using=es)
+                article.save(index='controcurator')
 
 
 
