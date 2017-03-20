@@ -32,7 +32,7 @@ class LDA:
 									strip_accents = 'unicode',
 									input='content',
 									stop_words=self.stop_words,
-			                        max_df = 0.3, 
+			                        max_df = 0.2, 
 			                        min_df = 0.01)
 		self.n_topics = n_topics
 		self.raw_files = raw_files
@@ -97,13 +97,13 @@ def main(json):
 	filenames = []
 	raw_text = []
 
-	n_samples = 2000
-	n_features = 1000
+	#n_samples = 2000
+	#n_features = 1000
 	
 	n_iterations = 50
-	n_topics = 50
+	n_topics = 75
 	alpha = 0.3
-	beta = 1.5
+	beta = 0.5
 
 
 	n_top_words = 10

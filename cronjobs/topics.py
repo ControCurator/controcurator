@@ -11,13 +11,13 @@ import re
 import collections
 
 sys.path.insert(0, '..')
-
+import elasticsearch
 from elasticsearch import Elasticsearch, ConnectionTimeout,helpers
 import controllers.topics_lda as Topics
 import controllers.train_lda as Train
 es = Elasticsearch(
     ['http://controcurator.org/ess/'],
-    port=80)
+    port=80,timeout=60)
 
 
 
@@ -43,7 +43,7 @@ query = {
     }
   },
   "from": 0,
-  "size": 10000,
+  "size": 5000,
   "sort": [],
   "aggs": {}
 }
@@ -53,42 +53,65 @@ data = response['hits']['hits']
 
 
 
-'''
-Topic Modeling LDA
 
 '''
-#train = Train.topic_train(data[0:4999])
-#test = Topics.topic_load(data[4999:9999])
+TOPIC MODELING LDA
+'''
+'''
+Train MODEL
+'''
+#train = Train.topic_train(data)
+
+'''
+Classify articles
+
+'''
 load_topics = Topics.topic_load(data)
 result = collections.defaultdict(list,load_topics)
 
 actions = []
 for article in data:
-    output = {}
     topics = result[article['_id']]
+    output = []
+    names = []
+    values = []
 
     for i,j in topics:
-        topic_score = i +" " + "("+str(j)+")"
-        output[i] = j
+        #topic_score = i +" " + "("+str(j)+")"
+        a = {}
+        a["name"] = i
+        a["value"] = j
+        
+        output.append(a)
+    
 
+    articlestr = str(article['_id'])
 
     action = {
-        "_op_type": "update",
-        "_index": "controcurator",
-        "_type": "article",
-        "_id": str(article['_id']),
-        "_source": {
-            "features": {
-                "topics" : { 
+        "update":{
+            "_index": 'controcurator',
+            "_type": 'article',
+            "_id": articlestr
+            
+      }
+    }
 
-                    }
-            }
+
+    new_data = {
+        "doc": {
+            "features":{ 
+          }
         }
     }
-    action["_source"]["features"]["topics"] = output
-    actions.append(action)
+    new_data['doc']['features']['topics'] = output
 
-helpers.bulk(es, actions)
+    
+    actions.append(action)
+    actions.append(new_data)
+
+
+
+#es.bulk(index = "controcurator", body = actions)
 
 
 

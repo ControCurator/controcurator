@@ -68,7 +68,7 @@ def top_ids(dtm,lda,tf_feature_names,top_words,topic_id):
 	global article_nr
 	global topic_dict
 
-	boolean = dtm > 0.2
+	boolean = dtm > 0.1
 	ids = np.argwhere(boolean)
 	ids = ids.flatten()
 	value = dtm[boolean]
@@ -117,7 +117,7 @@ def main(json):
 	'''Dictionary: Key: article ID, Value: (Topic(most relevant term) + Topic score)'''
 	#print Topicdict['57f3ba42e4b05e7633c585e8']
 	#print Topicdict['57f34be1e4b01506cbf24f39']
-
+	print_top_words(lda,tf_feature_names,5)
 
 	with open('../models/LDA/Topic_dict.pkl', 'wb') as Tdict:
 		pickle.dump(Topicdict,Tdict)

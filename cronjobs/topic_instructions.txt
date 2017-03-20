@@ -1,0 +1,14 @@
+#################
+Train Topic model
+#################
+- Enable Train variable line 63 in cronjobs/topics.py
+- set number of retrieved articles in "query" json variable - "size" parameter
+- Run topics.py
+
+#################
+Push topics to elasticsearch
+#################
+- Enable line 114 bulk command
+
+
+Requirements in models/LDA
