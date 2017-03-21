@@ -51,7 +51,7 @@ block content
 									td.two.wide.column Topics
 									td
 										- each topic in article.features.topics
-											a.ui.tag.label(href='/browse/search/trump',style='text-transform: capitalize;') #{topic.name}
+											a.ui.tag.label(href='/browse/search/#{topic.name}',style='text-transform: capitalize;') #{topic.name}
 												.detail #{topic.value}
 
 			.ui.eight.wide.column
