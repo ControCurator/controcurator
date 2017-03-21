@@ -10,18 +10,25 @@ html
 
   body
     header.ui.fixed.inverted.menu: div.ui.container
-      a.item(href='/browse/')= 'ControCurator'
+      a.item(href='/browse/',style='font-size: 40px;line-height: 0px;')= 'ControCurator'
 
-      div.ui.right.floated.right.aligned
+      
+      .ui.right.floated.right.aligned(style='width:100%')
         form(action='/browse/search/', method='GET')
           div.ui.search
-            div.ui.icon.input
+            div.ui.icon.input(style='float:right;margin-top: 16px;')
               input.prompt(name='id', type='text', placeholder= 'Search')
               i.search.icon
 
 
-    div.ui.main.container
+    .ui.main.container
       block error
       block content
         h1 Layout Example
         p If you can see this, something went terribly wrong
+
+
+  footer
+    div(style='position:fixed;right:10px;bottom:10px;width:200px')
+      img(src='/browse/images/commit.jpg',style='float:right;height:60px;')
+      img(src='/browse/images/vu.png',style='float:right;height:60px;')
