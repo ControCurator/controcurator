@@ -35,7 +35,7 @@ router.get('/', function(req, res, next) {
           ]
         }
         },
-        "size": 5,
+        "size": 10,
         "sort": {
           "features.controversy.value": "desc"
         }
@@ -67,7 +67,7 @@ router.get('/', function(req, res, next) {
             ]
           }
           },
-          "size": 5,
+          "size": 10,
           "sort": {
             "features.controversy.value": "asc"
           }

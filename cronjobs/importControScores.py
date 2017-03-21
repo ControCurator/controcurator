@@ -1,7 +1,7 @@
 import sys
 import json
 import pprint
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, ConnectionTimeout,helpers
 from esengine import ObjectField, Document
 
 

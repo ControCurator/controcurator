@@ -10,7 +10,7 @@ html
 
   body
     header.ui.fixed.inverted.menu: div.ui.container
-      a.item(href='/browse/',style='font-size: 40px;line-height: 0px;')= 'ControCurator'
+      a(href='/browse/',style='font-size: 40px;line-height: 70px;color: #FFF;')= 'ControCurator'
 
       
       .ui.right.floated.right.aligned(style='width:100%')
@@ -21,7 +21,7 @@ html
               i.search.icon
 
 
-    .ui.main.container
+    .ui.main.container(style='margin-top:100px;')
       block error
       block content
         h1 Layout Example
