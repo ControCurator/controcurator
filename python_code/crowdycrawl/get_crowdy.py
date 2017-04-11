@@ -90,7 +90,7 @@ def get_article_children(article, article_id, tries = MAXTRIES):
 		data_dict['parent'] = article
 		data_dict['retrieved'] = time
 		data_dict['source'] = SOURCE
-		pprint(data_dict)
+		#pprint(data_dict)
 		op_dict = {
 			"create": {
 				"_index": INDEX, 
