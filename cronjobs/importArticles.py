@@ -1,5 +1,5 @@
 '''
-Currently, updating received articles is disabled!
+Import Articles from the crowdynews database
 '''
 
 import sys
@@ -35,17 +35,19 @@ query = {"query":
                         {"match":
                              {"_type":"article"}
                          }
-                      , "must_not":
-                        {
-                            "match":
-                                {
-                                    "Processed" : "1"
-                                }
-                        }
                     }
               }
-    ,"from": 0,"size":100}
-response = es.search(index="crowdynews", body=query)
+    ,"from": 0,"size":10000}
+articles = es.search(index="crowdynews", body=query)
+
+
+articles['hits']['hits']
+
+print articles
+
+sys.exit('quit')
+
+
 
 getArticleMod.init()
 Article.init()

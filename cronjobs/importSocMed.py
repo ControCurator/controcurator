@@ -32,7 +32,8 @@ es = Elasticsearch(
 query = {
   "_source": {
     "includes": [
-      "parent.url"
+      "parent.url",
+      "urls"
     ]
   },
   "query": {
@@ -42,7 +43,7 @@ query = {
 		  "constant_score": {
 			"filter": {
 			  "missing": {
-				"field": "parent.url"
+				"field": "processed"
 			  }
 			}
 		  }

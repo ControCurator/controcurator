@@ -93,6 +93,11 @@ def load_anchors():
     return X,y,names
 
 
+def loadDocuments():
+    documents = Article.all()
+    return documents
+
+
 def load_data(path_to_file):
     '''
     Okay, let's load the Excel spreadsheet in which topics, 
@@ -287,26 +292,28 @@ if __name__=='__main__':
 
     ## DEMO ##
     # Initialize the model
-    X,y,names = load_anchors()
+    #X,y,names = load_anchors()
 
     #X,y,names = load_anchors()
-    model,trn_ds = initialize_model(X,y)
-    qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
+    #model,trn_ds = initialize_model(X,y)
+    #qs = UncertaintySampling(trn_ds, method='lc', model=LogisticRegression())
+    
     # Cell used for simulation, we randomly annotate words as being controversial or not 
     # During each iteration we update the model.
     # Lastly we call the 'controversial' function and sort all topics as controversial
     # or not based on the confidence score returned by the logistic regression
-    import warnings
-    warnings.filterwarnings('ignore')
+    #import warnings
+    #warnings.filterwarnings('ignore')
 
-    n_turns = 10
-    answers = ['noncontroversial','controversial']*int(n_turns/2)
-    random.shuffle(answers)
+    #n_turns = 10
+    #answers = ['noncontroversial','controversial']*int(n_turns/2)
+    #random.shuffle(answers)
   #  for t in range(n_turns):
   #    result = unsure()
   #    labeled = {json.loads(result)['unsure']:{'label':answers[t],'ip':'127.0.01'}}
   #    unsure(json.dumps(labeled)) 
 
-    controversies = controversial(trn_ds)
+    #controversies = controversial(trn_ds)
+    documents = loadDocuments()
     print(json.dumps(controversies))
 
