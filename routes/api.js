@@ -6,12 +6,18 @@ var exec = require('child_process').exec;
 var path = require('path');
 var parentDir = path.resolve(process.cwd());
 
+var jsonStream = require('express-jsonstream');
+
 
 router.get('/', function(req, res, next) {
     res.json({'info' : 'This is the ControCurator API v0.1'});
 });
 
 router.post('/',function(req,res) {
+    req.jsonStream()
+        .on('object',console.log);
+    return;
+    
 
     var input = req.body;
     var amountofitems = input.length;
