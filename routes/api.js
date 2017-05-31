@@ -12,22 +12,17 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/',function(req,res) {
-    //try {
-      //  var input = JSON.parse(req);
-    //} catch (e) {
-    //    res.json({'error':'Input was not valid JSON.'});
-    //}
-    console.log(req);
+
     var input = req.body;
-    var amountofitems= input.length;
-    console.log("total: "+amountofitems);
+    var amountofitems = input.length;
+
     var gooditems = 0;
     var baditems = 0;
 
     for (var i=0; i < amountofitems; i++)
     {
         var currentitem = input[i];
-        if (!currentitem.hasOwnProperty('id') || !currentitem.hasOwnProperty('text'))
+        if (!currentitem.hasOwnProperty('id') || !currentitem.hasOwnProperty('text')) //Test for an id and an actual body
         {
             baditems++;
             continue;
@@ -35,7 +30,6 @@ router.post('/',function(req,res) {
         gooditems++;
     }
     var controscore = Math.random();
-
 
     res.json({'controversy':controscore,'totalItems':amountofitems,'goodItems':gooditems,'badItems':baditems});
 
