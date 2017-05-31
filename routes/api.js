@@ -18,7 +18,7 @@ router.post('/',function(req,res) {
     //    res.json({'error':'Input was not valid JSON.'});
     //}
     console.log(req);
-    var input = req;
+    var input = req.body;
     var amountofitems= input.length;
     console.log("total: "+amountofitems);
     var gooditems = 0;
