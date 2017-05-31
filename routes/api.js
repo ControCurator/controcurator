@@ -12,12 +12,12 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/',function(req,res) {
-    try {
-        var input = JSON.parse(req);
-    } catch (e) {
-        res.json({'error':'Input was not valid JSON.'});
-    }
-
+    //try {
+      //  var input = JSON.parse(req);
+    //} catch (e) {
+    //    res.json({'error':'Input was not valid JSON.'});
+    //}
+    var input = req;
     var amountofitems = input.length;
     var gooditems = 0;
     var baditems = 0;
