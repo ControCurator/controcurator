@@ -22,8 +22,9 @@ router.post('/',function(req,res) {
     var gooditems = 0;
     var baditems = 0;
 
-    foreach (var currentitem in input)
+    for (var i=0; i < amountofitems; i++)
     {
+        var currentitem = input[i];
         if (!currentitem.hasOwnProperty('id') || !currentitem.hasOwnProperty('text'))
         {
             baditems++;
