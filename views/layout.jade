@@ -9,29 +9,32 @@ html
     script(src='/browse/javascripts/main.js')
 
   body
-    header.ui.fixed.inverted.menu: div.ui.container
-      a(href='/browse/',style='font-size: 40px;line-height: 70px;color: #FFF;')= 'ControCurator'
+    div.ui.right.very.wide.menu.vertical.sidebar
+      include annotation
 
-      
-      .ui.right.floated.right.aligned(style='width:100%')
-        form(action='/browse/search/', method='GET')
-          div.ui.search
-            div.ui.icon.input(style='float:right;margin-top: 16px;')
-              input.prompt(name='id', type='text', placeholder= 'Search')
-              i.search.icon
+    div.pusher
+      header.ui.fixed.inverted.menu: div.ui.container
+        a(href='/browse/',style='font-size: 40px;line-height: 70px;color: #FFF;')= 'ControCurator'
 
-
-    .ui.main.container(style='margin-top:100px;')
-      block error
-      block content
-        h1 Layout Example
-        p If you can see this, something went terribly wrong
+        
+        .ui.right.floated.right.aligned(style='width:100%')
+          form(action='/browse/search/', method='GET')
+            div.ui.search
+              div.ui.icon.input(style='float:right;margin-top: 16px;')
+                input.prompt(name='id', type='text', placeholder= 'Search')
+                i.search.icon
 
 
-  footer
-    div(style='position:fixed;right:10px;bottom:10px;width:200px;')
-      img(src='/browse/images/vu.png',style='float:right;height:60px;margin-bottom:20px;')
-      img(src='/browse/images/uva.jpg',style='float:right;height:60px;margin-bottom:20px;')
-      img(src='/browse/images/crowdynews.jpg',style='float:right;height:60px;margin-bottom:20px;')
-      img(src='/browse/images/nisv.jpg',style='float:right;height:60px;margin-bottom:20px;')
-      img(src='/browse/images/commit.jpg',style='float:right;height:60px;')
+      .ui.main.container(style='margin-top:100px;')
+        block error
+        block content
+          h1 Layout Example
+          p If you can see this, something went terribly wrong
+
+
+        footer(style='padding-top:50px;')
+          img(src='/browse/images/vu.png',style='float:left;height:60px;margin-right:40px;')
+          img(src='/browse/images/uva.jpg',style='float:left;height:60px;margin-right:40px;')
+          img(src='/browse/images/crowdynews.jpg',style='float:left;height:60px;margin-right:40px;')
+          img(src='/browse/images/nisv.jpg',style='float:left;height:60px;margin-right:40px;')
+          img(src='/browse/images/commit.jpg',style='float:left;height:60px;')

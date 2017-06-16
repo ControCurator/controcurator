@@ -4,4 +4,10 @@ $(document).ready(function() {
          $('.annotation .task').html('Is Immunization a controversial topic?');
      //});
   });
+  $('.annotate-toggle').on('click',function(){
+		$('.ui.sidebar')
+		  .sidebar('setting', 'transition', 'overlay')
+		  .sidebar('toggle')
+		;
+	});
 });
