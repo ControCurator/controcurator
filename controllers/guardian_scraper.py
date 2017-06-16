@@ -55,10 +55,10 @@ class GuardianScraper:
 		'''
 		# Added a quick hack here to prevent the script from crashing
 		try:
-			#page_id = page['response']['content']['blocks']['body'][0]['id']
-			page_id = ''.join([ch for ch in page['response']['content']['id'] if ch.isalpha()])
+			page_id = page['response']['content']['blocks']['body'][0]['id']
+			#page_id = ''.join([ch for ch in page['response']['content']['id'] if ch.isalpha()])
 		except:
-
+			print page['response']
 			print 'File with API URL \n%s\n has no ID, return None'%api_url
 			return None,None
 

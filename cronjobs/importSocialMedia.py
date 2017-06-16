@@ -18,22 +18,39 @@ es = Elasticsearch(
     ['http://controcurator.org/ess/'],
     port=80)
 
-query = {"query":
-             {"bool":
-                  { "must":
-                        {"match":
-                             {"_type":"twitter"}
-                         }
-                      , "must_not":
-                        {
-                            "match":
-                                {
-                                    "Processed" : "1"
-                                }
-                        }
-                    }
+query = {
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "term": {
+            "source": "vaccination"
+          }
+        },
+        {
+          "constant_score": {
+            "filter": {
+              "missing": {
+                "field": "parent.url"
               }
-    ,"from": 0}
+            }
+          }
+        },
+        {
+          "constant_score": {
+            "filter": {
+              "missing": {
+                "field": "source"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "from": 0,
+  "size": 10
+}
 
 #markProcessed.init()
 

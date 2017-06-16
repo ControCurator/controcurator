@@ -74,16 +74,16 @@ while scroll_size > 0:
       try:
         date = socmed['_source']['date']
       except:
-        print socmed['_id']
-        date = ''
+        print 'failed',socmed['_id']
+        continue
     urls.append([url,date])
     
   response = es.scroll(scroll_id=scroll_id,scroll='2m')
   scroll_size = len(response['hits']['hits'])
 
 df = pd.DataFrame(urls)
-#freq = df[0].value_counts()
-freq = df
+freq = df[0].value_counts()
+#freq = df
 freq.to_csv('socmed-freq.csv')
 #print urls
 

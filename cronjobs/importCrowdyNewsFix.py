@@ -17,6 +17,7 @@ import random
 from controllers.guardian_scraper import GuardianScraper
 from string import replace
 import re
+import pandas as pd
 
 import sys
 reload(sys)
@@ -29,18 +30,204 @@ es = Elasticsearch(
 		['http://controcurator.org/ess/'],
 		port=80)
 
+
+
+
+# get articles
+# count socmed
+query = {
+  "query": {
+"bool": {
+"must": [
+{
+"match_all": { }
+}
+]
+    }
+  },
+  "from": 0,
+  "size": 10000
+}
+
+
+
+
+# count socmed
+query = {
+  "_source": {
+    "includes": [
+      "parent.url"
+    ]
+  },
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "term": {
+            "source": "vaccination"
+          }
+        },
+        {
+          "constant_score": {
+            "filter": {
+              "missing": {
+                "field": "parent.url"
+              }
+            }
+          }
+        },
+        {
+          "constant_score": {
+            "filter": {
+              "missing": {
+                "field": "source"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "from": 0,
+  "size": 10000
+}
+
+
+response = es.search(index="crowdynews", body=query)
+
+data = response['hits']['hits']
+actions = []
+urls = {}
+
+for socmed in data:
+
+	url = unquote(re.sub('\/v1\/(.*[a-z])\/controcuratorguardian\?q=','',str(socmed['_source']['parent']['url']),))
+	if url not in urls:
+		urls[url] = {'socmed' : 0}
+	urls[url]['socmed'] += 1
+
+
+for url in urls:
+	print url
+	#print url
+	query = {
+	  "query": {
+		"constant_score": {
+		  "filter": {
+			"term": {
+			  "url": url
+			}
+		  }
+		}
+	  },
+	  "from": 0,
+	  "size": 1
+	}
+
+	response = es.search(index="controcurator", doc_type="article", body=query)
+	if len(response['hits']['hits']) == 0:
+		print "ARTICLE NOT FOUND"
+		urls[url]['comments'] = 'nan'
+	else:
+		print "ARTICLE FOUND"
+		if 'comments' not in response['hits']['hits'][0]['_source']:
+			print "NO COMMENTS"
+			continue
+		urls[url]['comments'] = len(response['hits']['hits'][0]['_source']['comments'])
+
+
+df = pd.DataFrame(urls).T
+#freq = df
+df.to_csv('socmed-urls.csv')
+
+
+sys.exit('quit')
+
+
+
+
+
+
+
+
+
 # build a list of all articles in the database
-query = {"query":
-						 {"bool":
-									{ "must":
-												{"match":
-														 {"_type":"article"}
-												 }
-										}
-							}
-		,"from": 0,"size":10000}
+query = {
+  "query": {
+    "bool": {
+      "must": {
+        "match": {
+          "_type": "article"
+        }
+      },
+    "must_not": {
+        "match": {
+          "source": "vaccination"
+        }
+      }
+    }
+  },
+  "from": 0,
+  "size": 10000
+}
+
+
+
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "term": {
+            "source": "vaccination"
+          }
+        },
+        {
+          "constant_score": {
+            "filter": {
+              "missing": {
+                "field": "parent.url"
+              }
+            }
+          }
+        },
+        {
+          "constant_score": {
+            "filter": {
+              "missing": {
+                "field": "source"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "from": 0,
+  "size": 10
+}
+
+
 articles = es.search(index="crowdynews", body=query)
 articles = articles['hits']['hits']
+
+def getUrl(url):
+	return unquote(re.sub('\/v1\/(.*[a-z])\/controcurator\?q=','',str(url),))
+
+
+data = {getUrl(article['_source']['url']) : {'document' : article['_source']['url'],'title' : re.sub(u"(\u2018|\u2019)", "'", article['_source']['title'])} for article in articles}
+
+print len(articles)
+print len(data)
+
+df = pd.DataFrame(data)
+#freq = df
+df.T.to_csv('article-freq.csv')
+
+sys.exit('quit')
+
+
+
 
 
 
