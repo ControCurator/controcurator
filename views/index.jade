@@ -20,7 +20,7 @@ block content
 						- var red = Math.round(rounded * 2.2)
 						- var green = 220 - red
 						div(style='float:right; margin-left:20px;')
-							div(class="ui active progress" style="width:100px")
+							div(class="ui active progress" style="width:100px", data-content="Add users to your feed")
 								div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
 									div(class="progress") #{rounded}%
 						a(href='/browse/article/'+article._id, style="") #{article._source.document.title}
