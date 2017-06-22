@@ -5,113 +5,106 @@ block annotation
 			h2.ui.dividing.header Tell us your perspective on this article
 			p Please read the first two paragraphs of the article and social media comments at the end of the article.
 			p Select the statements below with which you agree:
-			hr
-			p
-				| It seems that 
-				b many people 
-				| are involved in discussions on the article topic
+
+			.ui.vertical.segment
+				h5
+					i Many people 
+					| are involved in discussions on the topic of this article
 				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="a1")
 					label(for="a1") Yes
-				.ui.checkbox
+				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="a2")
 					label(for="a2") No
 				.ui.checkbox
 					input(type="checkbox",id="a3")
-					label(for="a3") This is not possible to derive from the comments on the article
+					label(for="a3") I am not sure what this means
 				.ui.checkbox
 					input(type="checkbox",id="a4")
-					label(for="a4") I am not sure what this statement means
-			hr
-			p
-				| It seems that there are 
-				b opposing views 
-				| on the topic of this article
+					label(for="a4") I cannot conclude this from the comments of this article
+			
+			.ui.vertical.segment
+				h5
+					| There are 
+					i opposing views 
+					| on the topic of this article
 				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="b1")
 					label(for="b1") Yes
-				.ui.checkbox
+				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="b2")
 					label(for="b2") No
 				.ui.checkbox
 					input(type="checkbox",id="b3")
-					label(for="b3") This is not possible to derive from the comments on the article
+					label(for="b3") I am not sure what this means
 				.ui.checkbox
 					input(type="checkbox",id="b4")
-					label(for="b4") I am not sure what this statement means
-			hr
-			p
-				| It seems there is 
-				b a public discussion 
-				| on this topic
+					label(for="b4") I cannot conclude this from the comments of this article
+			
+			.ui.vertical.segment
+				h5
+					| There is 
+					i a public discussion 
+					| on the topic of this article
 				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="c1")
 					label(for="c1") Yes
-				.ui.checkbox
+				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="c2")
 					label(for="c2") No
 				.ui.checkbox
 					input(type="checkbox",id="c3")
-					label(for="c3") This is not possible to derive from the comments on the article
+					label(for="c3") I am not sure what this means
 				.ui.checkbox
 					input(type="checkbox",id="c4")
-					label(for="c4") I am not sure what this statement means
-			hr
-			p
-				| It seems that the discussions on this topic 
-				b go on for a long time
+					label(for="c4") I cannot conclude this from the comments of this article
+			
+			.ui.vertical.segment
+				h5
+					| The discussions on this topic 
+					i is going on for a long time
 				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="d1")
 					label(for="d1") Yes
-				.ui.checkbox
+				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="d2")
 					label(for="d2") No
 				.ui.checkbox
 					input(type="checkbox",id="d3")
-					label(for="d3") This is not possible to derive from the comments on the article
+					label(for="d3") I am not sure what this means
 				.ui.checkbox
 					input(type="checkbox",id="d4")
-					label(for="d4") I am not sure what this statement means
-			hr
-			p
-				| It seems that the topic of this article 
-				b triggers strong emotional responses
+					label(for="d4") I cannot conclude this from the comments of this article
+			.ui.vertical.segment
+				h5
+					| The topic of this article 
+					i triggers strong emotional responses
 				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="e1")
 					label(for="e1") Yes
-				.ui.checkbox
+				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="e2")
 					label(for="e2") No
 				.ui.checkbox
 					input(type="checkbox",id="e3")
-					label(for="e3") This is not possible to derive from the comments on the article
+					label(for="e3") I am not sure what this means
 				.ui.checkbox
 					input(type="checkbox",id="e4")
-					label(for="e4") I am not sure what this statement means
-			hr
+					label(for="e4") I cannot conclude this from the comments of this article
 
-			p
-				| The topic of this article is 
-				b controversial
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="f1")
-					label(for="f1") Yes
-				.ui.checkbox
-					input(type="checkbox",id="f2")
-					label(for="f2") No
-				.ui.checkbox
-					input(type="checkbox",id="f3")
-					label(for="f3") This is not possible to derive from the comments on the article
-				.ui.checkbox
-					input(type="checkbox",id="f4")
-					label(for="f4") I am not sure what this statement means
-			hr
+			.ui.vertical.segment
+				h5 The topic of this article is
+				.centered.ui.buttons
+					button.ui.blue.button Controversial
+					.or
+					button.ui.negative.button Not Controversial
+					.or
+					button.ui.grew.button I don't know
 
 
-
-			h2 Tell us your perspective on controversy
-			p
-				| Did the exposure to the controversy help you understand the topic of the article?
+			h3.ui.dividing.header How helpful were the following things for having a better understanding of controversy on this article?
+			.ui.vertical.segment
+				h5 Did the exposure to the controversy help you understand the topic of the article?
 				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="g1")
 					label(for="g1") Yes
@@ -121,9 +114,8 @@ block annotation
 				.ui.checkbox
 					input(type="checkbox",id="g3")
 					label(for="g3") I don't know
-			hr
-			p
-				| Did the exposure to the aspects of controvery help you understand the controversy?
+			.ui.vertical.segment
+				h5 Did the exposure to the aspects of controvery help you understand the controversy?
 				.ui.checkbox(style="margin-right:20px;")
 					input(type="checkbox",id="h1")
 					label(for="h1") Yes

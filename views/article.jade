@@ -6,26 +6,13 @@ block content
 		h1.ui.ten.wide.column 
 		| Article "<strong>#{id}</strong>" does not exist.
 	- else
-
-
 		.ui.grid
+
 			.ui.sixteen.wide.column
 				.ui.segment
-					h1.ui.dividing.header
-						.content
-							| Article
-						button.ui.blue.small.right.floated.button.annotate-toggle
-							| Tell us your perspective on this article
-					div(style="color: #333; font-family: Georgia; line-height: 1.625rem;")
-						h3.ui.blue.header
-							!= article.document.title
-							.sub.header
-								| Published in #{article.source} on #{article.published}
-						!= article.document.text
-
 					h5.ui.horizontal.divider.header
 						i.bar.chart.icon
-						| Article Properties
+						| Scores for "#{article.document.title}" 
 					table.ui.definition.table
 						tbody
 							tr
@@ -34,9 +21,17 @@ block content
 									- var rounded = Math.round(article.features.controversy.value * 100)
 									- var red = Math.round(rounded * 2.2)
 									- var green = 220 - red
-									div.ui.active.progress(style="width:400px;margin:0px;")
-										div.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},0)")
-											div.progress #{rounded}%
+									.ui.active.progress(style="width:400px;margin:0px;display:inline-block;")
+										.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},0)")
+											.progress #{rounded}%
+
+									.ui.icon.buttons(style="float:right;")
+										button.ui.disabled.button
+											| Do you agree?
+										button.ui.green.button
+											i.thumbs.outline.up.icon
+										button.ui.red.button
+											i.thumbs.outline.down.icon
 
 							if article.features.quality
 								tr
@@ -45,16 +40,25 @@ block content
 										- var rounded = 100-Math.round(article.features.controversy.value * 100)
 										- var green = Math.round(rounded * 2.2)
 										- var red = 220 - green
-										div.ui.active.progress(style="width:400px;margin:0px;")
-											div.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},0)")
-												div.progress #{rounded}%
+										.ui.active.progress.pop(style="width:400px;margin:0px;", data-title="Explanation", data-variation="small", data-content="The confidence that the topic of this article is controversial is #{rounded}%.")
+											.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},0)")
+												.progress #{rounded}%
 							if article.features.topics
 								tr
 									td.two.wide.column Topics
 									td
 										- each topic in article.features.topics
-											a.ui.tag.label(href='/browse/search/#{topic.name}',style='text-transform: capitalize;') #{topic.name}
+											a.ui.tag.label.pop(href='/browse/search/#{topic.name}',style='text-transform: capitalize;', data-title="Explanation", data-variation="small", data-content="The article is about the topic '#{topic.name}' with a confidence of #{topic.value}.") #{topic.name}
 												.detail #{topic.value}
+							tr
+								td.two.wide.column Actors
+								td.pop(data-title="Explanation", data-variation="small", data-content="There were #{stats.actors} actors that discussed the topic of this article.") #{stats.actors}
+							tr
+								td.two.wide.column Comments
+								td.pop(data-title="Explanation", data-variation="small", data-content="There were #{stats.comments} comments related to this article.") #{stats.comments}
+							tr
+								td.two.wide.column Duration
+								td.pop(data-title="Explanation", data-variation="small", data-content="The discussion on the topic of this article lasted for #{stats.duration}.") #{stats.duration}
 
 			.ui.eight.wide.column
 				.ui.segment
@@ -72,7 +76,7 @@ block content
 							- var posred = 125 - Math.round(comment.sentiment.positivity / comment.sentiment.words * 125)
 							- var neggreen = 125 - Math.round(comment.sentiment.negativity / comment.sentiment.words * 125)
 							- var negred = 125 + Math.round(comment.sentiment.negativity / comment.sentiment.words * 125)
-							div(style='float: right; border: 1px solid rgba(34,36,38,.15); background: rgba(0,0,0,.03); padding: 6px; border-radius: .28571429rem; margin: 10px 0 20px 20px;font-family: Lato,Arial,Helvetica,sans-serif;')
+							div.pop(data-title="Explanation", data-variation="small", data-content="The words in this comment that express negative sentiment have a strength of #{negativity}%, while the words with positive sentiment have #{positivity}% strength. The average score for all sentimental words in this comment is #{sentiment*100}%.", style='float: right; border: 1px solid rgba(34,36,38,.15); background: rgba(0,0,0,.03); padding: 6px; border-radius: .28571429rem; margin: 10px 0 20px 20px;font-family: Lato,Arial,Helvetica,sans-serif;')
 								div(style="text-align:center;")
 									b
 										| Sentiment
@@ -107,7 +111,7 @@ block content
 							- var posred = 125 - Math.round(comment.sentiment.positivity / comment.sentiment.words * 125)
 							- var neggreen = 125 - Math.round(comment.sentiment.negativity / comment.sentiment.words * 125)
 							- var negred = 125 + Math.round(comment.sentiment.negativity / comment.sentiment.words * 125)
-							div(style='float: right; border: 1px solid rgba(34,36,38,.15); background: rgba(0,0,0,.03); padding: 6px; border-radius: .28571429rem; margin: 10px 0 20px 20px;font-family: Lato,Arial,Helvetica,sans-serif;')
+							div.pop(data-title="Explanation", data-variation="small", data-content="The words in this comment that express negative sentiment have a strength of #{negativity}%, while the words with positive sentiment have #{positivity}% strength. The average score for all sentimental words in this comment is #{sentiment*100}%.", style='float: right; border: 1px solid rgba(34,36,38,.15); background: rgba(0,0,0,.03); padding: 6px; border-radius: .28571429rem; margin: 10px 0 20px 20px;font-family: Lato,Arial,Helvetica,sans-serif;')
 								div(style="text-align:center;")
 									b
 										| Sentiment
@@ -125,4 +129,18 @@ block content
 								!= comment.text
 						hr(style="clear:both")
 
+
+			.ui.sixteen.wide.column
+				.ui.segment
+					h1.ui.dividing.header
+						.content
+							| Article
+						button.ui.blue.small.right.floated.button.annotate-toggle
+							| Tell us your perspective on this article
+					div(style="color: #333; font-family: Georgia; line-height: 1.625rem;")
+						h3.ui.blue.header
+							!= article.document.title
+							.sub.header
+								| Published in #{article.source} on #{article.published}
+						!= article.document.text
 

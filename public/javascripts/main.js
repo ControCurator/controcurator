@@ -10,4 +10,9 @@ $(document).ready(function() {
 		  .sidebar('toggle')
 		;
 	});
+  var call = window.location.hash.substr(1);
+  if(call == 'annotate') {
+    $('.ui.sidebar').sidebar('setting', 'transition', 'overlay').sidebar('toggle');
+  }
+  $('.pop').popup();
 });

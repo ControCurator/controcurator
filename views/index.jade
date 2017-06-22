@@ -20,9 +20,9 @@ block content
 						- var red = Math.round(rounded * 2.2)
 						- var green = 220 - red
 						div(style='float:right; margin-left:20px;')
-							div(class="ui active progress" style="width:100px", data-content="Add users to your feed")
-								div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
-									div(class="progress") #{rounded}%
+							.ui.active.progress.pop(style="width:100px", data-title="Explanation", data-variation="small", data-content="The confidence that the topic of this article is controversial is #{rounded}%.")
+								.bar(style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
+									.progress #{rounded}%
 						a(href='/browse/article/'+article._id, style="") #{article._source.document.title}
 					hr(style="clear:both")
 
@@ -36,13 +36,13 @@ block content
 						- var red = Math.round(rounded * 2.2)
 						- var green = 220 - red
 						div(style='float:right; margin-left:20px;')
-							div(class="ui active progress" style="width:100px")
-								div(class="bar" style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
-									div(class="progress") #{rounded}%
+							.ui.active.progress.pop(style="width:100px", data-title="Explanation", data-variation="small", data-content="The confidence that the topic of this article is controversial is #{rounded}%.")
+								.bar(style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
+									.progress #{rounded}%
 						a(href='/browse/article/'+article._id, style="") #{article._source.document.title}
 					hr(style="clear:both")
 
 		.ui.sixteen.wide.column.right.aligned
-			a.ui.right.labeled.icon.primary.button(href='/browse/article/'+top[0]._id)
+			a.ui.right.labeled.icon.primary.button(href='/browse/article/'+top[0]._id+'#annotate')
 				i.right.arrow.icon
-				| Please help us by annotating an article
+				| Tell us your perspective on an article
