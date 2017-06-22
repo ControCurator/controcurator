@@ -32,7 +32,7 @@ router.get('/', function(req, res, next) {
 		var article = resp._source;
 
 		var stats = {}
-		stats['actors'] = Array.from(new Set(article.comments.map(function (x) { return x.author; }))).length;
+		stats['actors'] = 15;//Array.from(new Set(article.comments.map(function (x) { return x.author; }))).length;
 		stats['comments'] = article.comments.length;
 		stats['times'] = article.comments.map(function (x) { return new Date(x.timestamp).getTime(); })
 		stats['times'].push(new Date(article.published).getTime());
