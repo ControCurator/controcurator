@@ -30,7 +30,7 @@ function pagination(c, m) {
 		}  
 		range.push(m);
 
-		for (var i of range) {
+		for (var i in range) {
 				if (l) {
 						if (i - l === 2) {
 								rangeWithDots.push(l + 1);
