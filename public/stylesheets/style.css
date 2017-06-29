@@ -19,3 +19,13 @@ div.main.container {
 .term {
 	border-bottom: 1px solid #333333;
 }
+
+.rate {
+	color:#999999;
+}
+.rate .positive:hover {
+	color:#21ba45;
+}
+.rate .negative:hover {
+	color:#db2828;
+}

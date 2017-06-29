@@ -6,43 +6,71 @@ block content
 
 		.ui.sixteen.wide.column
 			.ui.segment
-				h2.ui.teal.header
+				h2.ui.header
 					.content Controversy over time
-				iframe(style="border:0px;" src="http://controcurator.org/kibana/app/kibana#/visualize/create?embed=true&type=line&indexPattern=controcurator&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:'2016-10-01T15:55:27.190Z',mode:absolute,to:'2016-12-01T16:55:27.190Z'))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(spy:(mode:(fill:!f,name:!n))),vis:(aggs:!((id:'1',params:(field:features.controversy.value),schema:metric,type:avg),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:published,interval:d,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!t,addTooltip:!f,defaultYExtents:!t,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!f,shareYAxis:!t,showCircles:!t,smoothLines:!t,times:!(),yAxis:()),title:'Controversy',type:line))" height="200" width="100%")
+				iframe(style="border:0px;" src="http://controcurator.org/kibana/app/kibana#/visualize/create?embed=true&type=line&indexPattern=controcurator&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:'2016-10-01T15:55:27.190Z',mode:absolute,to:'2016-12-01T16:55:27.190Z'))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'*')),uiState:(spy:(mode:(fill:!f,name:!n))),vis:(aggs:!((id:'1',params:(field:features.controversy.value),schema:metric,type:avg),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:published,interval:d,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!t,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!t,shareYAxis:!t,showCircles:!f,smoothLines:!t,times:!(),yAxis:(max:1,min:0)),title:Controversy,type:line))" height="200" width="100%")
 
-		.ui.eight.wide.column
-			.ui.segment
-				h2.ui.teal.header
-					.content Most Controversial Issues
-				- each article,i in top
-					div(style='display:block;')
-						- var rounded = Math.round(article._source.features.controversy.value * 100)
-						- var red = Math.round(rounded * 2.2)
-						- var green = 220 - red
-						div(style='float:right; margin-left:20px;')
-							.ui.active.progress.pop(style="width:100px", data-title="Explanation", data-variation="small", data-content="The confidence that the topic of this article is controversial is #{rounded}%.")
-								.bar(style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
-									.progress #{rounded}%
-						a(href='/browse/article/'+article._id, style="") #{article._source.document.title}
-					hr(style="clear:both")
-
-		.ui.eight.wide.column
-			.ui.segment
-				h2.ui.teal.header
-					.content Least Controversial Issues
-				- each article,i in bottom
-					div(style='display:block;')
-						- var rounded = Math.round(article._source.features.controversy.value * 100)
-						- var red = Math.round(rounded * 2.2)
-						- var green = 220 - red
-						div(style='float:right; margin-left:20px;')
-							.ui.active.progress.pop(style="width:100px", data-title="Explanation", data-variation="small", data-content="The confidence that the topic of this article is controversial is #{rounded}%.")
-								.bar(style="width:#{rounded}px; background-color: rgb(#{red},#{green},0)")
-									.progress #{rounded}%
-						a(href='/browse/article/'+article._id, style="") #{article._source.document.title}
-					hr(style="clear:both")
 
 		.ui.sixteen.wide.column.right.aligned
-			a.ui.right.labeled.icon.primary.button(href='/browse/article/'+top[0]._id+'#annotate')
+			a.ui.right.labeled.icon.orange.button(href='/browse/article/'+top[0]._id+'#annotate')
 				i.right.arrow.icon
 				| Tell us your perspective on an article
+
+		.ui.sixteen.wide.column
+			.ui.segment
+				.ui.grid
+					.ui.sixteen.wide.column.right.aligned
+						.ui.pagination.menu
+							.item Page
+							- each p in pages
+								if p == current
+									a.item.active(href='/?page='+p) #{p}
+								else if p == '...'
+									.item #{p}
+								else
+									a.item(href='/?page='+p) #{p}
+
+					.ui.eight.wide.column
+						
+							h2.ui.header
+								.content Most Controversial Issues
+							- each article,i in top
+								div(style='display:block;')
+									- var rounded = Math.round(article._source.features.controversy.value * 100)
+									- var red = 208 - Math.round(article._source.features.controversy.value * (208 - 33));
+									- var green = 208 - Math.round(article._source.features.controversy.value * (208 - 133));
+									- var blue = 208;
+									.pop(style='float:right; margin-left:20px;', data-title="Explanation", data-variation="small", data-content="The confidence that the topic of this article is controversial is #{rounded}%.")
+										.ui.active.progress(style="width:100px")
+											.bar(style="width:#{rounded}px; background-color: rgb(#{red},#{green},#{blue})")
+												.progress #{rounded}%
+									a(href='/browse/article/'+article._id, style="") #{article._source.document.title}
+								hr(style="clear:both")
+
+					.ui.eight.wide.column
+						
+							h2.ui.header
+								.content Least Controversial Issues
+							- each article,i in bottom
+								div(style='display:block;')
+									- var rounded = Math.round(article._source.features.controversy.value * 100)
+									- var red = 208 - Math.round(article._source.features.controversy.value * (208 - 33));
+									- var green = 208 - Math.round(article._source.features.controversy.value * (208 - 133));
+									- var blue = 208;
+									.pop(style='float:right; margin-left:20px;', data-title="Explanation", data-variation="small", data-content="The confidence that the topic of this article is controversial is #{rounded}%.")
+										.ui.active.progress(style="width:100px")
+											.bar(style="width:#{rounded}px; background-color: rgb(#{red},#{green},#{blue})")
+												.progress #{rounded}%
+									a(href='/browse/article/'+article._id, style="") #{article._source.document.title}
+								hr(style="clear:both")
+
+					.ui.sixteen.wide.column.right.aligned
+						.ui.pagination.menu
+							.item Page
+							- each p in pages
+								if p == current
+									a.item.active(href='/?page='+p) #{p}
+								else if p == '...'
+									.item #{p}
+								else
+									a.item(href='/?page='+p) #{p}
