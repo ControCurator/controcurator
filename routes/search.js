@@ -26,18 +26,17 @@ function pagination(c, m) {
     }  
     range.push(m);
 
-    for (var i in range) {
+    for (i in range) {
         if (l) {
-            if (i - l === 2) {
+            if (range[i] - l === 2) {
                 rangeWithDots.push(l + 1);
-            } else if (i - l !== 1) {
+            } else if (range[i] - l !== 1) {
                 rangeWithDots.push('...');
             }
         }
-        rangeWithDots.push(i);
-        l = i;
+        rangeWithDots.push(range[i]);
+        l = range[i];
     }
-
     return rangeWithDots;
 }
 
@@ -109,7 +108,6 @@ router.get('/', function(req, res, next) {
       var positives = scores.filter(function(x) { return x >= 0.5; });
       var negatives = scores.filter(function(x) { return x < 0.5; });
       var count = Math.max(positives.length,negatives.length);
-      console.log(count);
 
       var s = articles.map(function (x) { return x._source.features.controversy});
       s = s.filter(function(x) { return 'value' in x; });
@@ -123,7 +121,6 @@ router.get('/', function(req, res, next) {
         'emotion': s.map(function (x) { return x.emotion})
       }
 
-      console.log(stats);
       stats['controversy'] = Math.max.apply(Math,stats['controversy']);
       var sum = stats['actors'].reduce(function(a, b) { return a + b; });
       stats['actors'] = sum / stats['actors'].length;
@@ -133,7 +130,6 @@ router.get('/', function(req, res, next) {
       stats['persistence'] = Math.max.apply(Math,stats['persistence']);
       var sum = stats['emotion'].reduce(function(a, b) { return a + b; });
       stats['emotion'] = sum / stats['emotion'].length;
-      console.log(stats);
 
 //      stats = stats.reduce(function (x) { return sum(x) / x.length});
 
@@ -147,7 +143,11 @@ router.get('/', function(req, res, next) {
       var perpage = 10;
       var total = count;
       var pages = Math.ceil(total / perpage);
-      var pagelist = pagination(page, pages);
+      if(pages < 2) {
+        pagelist = [1]
+      } else {
+        var pagelist = pagination(page, pages);
+      }
       var from = (page - 1) * perpage;
 
         var topquery = {

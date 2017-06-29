@@ -39,18 +39,17 @@ function pagination(c, m) {
 		}  
 		range.push(m);
 
-		for (var i in range) {
+		for (i in range) {
 				if (l) {
-						if (i - l === 2) {
+						if (range[i] - l === 2) {
 								rangeWithDots.push(l + 1);
-						} else if (i - l !== 1) {
+						} else if (range[i] - l !== 1) {
 								rangeWithDots.push('...');
 						}
 				}
-				rangeWithDots.push(i);
-				l = i;
+				rangeWithDots.push(range[i]);
+				l = range[i];
 		}
-
 		return rangeWithDots;
 }
 
@@ -106,7 +105,11 @@ router.get('/', function(req, res, next) {
 		var perpage = 5;
 		var total = commentCount;
 		var pages = Math.ceil(total / perpage);
-		var pagelist = pagination(page, pages);
+		if(pages < 2) {
+			pagelist = [1]
+		} else {
+			var pagelist = pagination(page, pages);
+		}
 		var from = (page - 1) * perpage;
 
 		positive = positive.slice(from, from + perpage);

@@ -24,11 +24,11 @@ block content
 							.item Page
 							- each p in pages
 								if p == current
-									a.item.active(href='/?page='+p) #{p}
+									a.item.active(href='?page='+p) #{p}
 								else if p == '...'
 									.item #{p}
 								else
-									a.item(href='/?page='+p) #{p}
+									a.item(href='?page='+p) #{p}
 
 					.ui.eight.wide.column
 						
@@ -69,8 +69,8 @@ block content
 							.item Page
 							- each p in pages
 								if p == current
-									a.item.active(href='/?page='+p) #{p}
+									a.item.active(href='?page='+p) #{p}
 								else if p == '...'
 									.item #{p}
 								else
-									a.item(href='/?page='+p) #{p}
+									a.item(href='?page='+p) #{p}

@@ -29,19 +29,19 @@ function pagination(c, m) {
 				}
 		}  
 		range.push(m);
-
-		for (var i in range) {
+		console.log(range);
+		for (i in range) {
 				if (l) {
-						if (i - l === 2) {
+						if (range[i] - l === 2) {
 								rangeWithDots.push(l + 1);
-						} else if (i - l !== 1) {
+						} else if (range[i] - l !== 1) {
 								rangeWithDots.push('...');
 						}
 				}
-				rangeWithDots.push(i);
-				l = i;
+				rangeWithDots.push(range[i]);
+				l = range[i];
 		}
-
+		console.log(rangeWithDots);
 		return rangeWithDots;
 }
 
