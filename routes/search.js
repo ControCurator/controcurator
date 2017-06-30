@@ -5,7 +5,11 @@ var router = express.Router({mergeParams: true});
 var exec = require('child_process').exec;
 var path = require('path');
 var parentDir = path.resolve(process.cwd());
-
+var elasticsearch = require('elasticsearch');
+var client = new elasticsearch.Client({
+  host: 'http://controcurator.org/ess'
+});
+var md5 = require('md5');
 
 function pagination(c, m) {
     "use strict";
@@ -43,10 +47,29 @@ function pagination(c, m) {
 
 router.get('/', function(req, res, next) {
 
+
+
+
   var iframe = "http://controcurator.org/kibana/app/kibana#/visualize/create?embed=true&type=line&indexPattern=controcurator&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:'2016-10-01T15:55:27.190Z',mode:absolute,to:'2016-12-01T16:55:27.190Z'))&_a=(filters:!(),linked:!f,query:(query_string:(analyze_wildcard:!t,query:'"+req.params.id+"')),uiState:(spy:(mode:(fill:!f,name:!n))),vis:(aggs:!((id:'1',params:(field:features.controversy.value),schema:metric,type:avg),(id:'2',params:(customInterval:'2h',extended_bounds:(),field:published,interval:d,min_doc_count:1),schema:segment,type:date_histogram)),listeners:(),params:(addLegend:!t,addTimeMarker:!f,addTooltip:!t,defaultYExtents:!t,drawLinesBetweenPoints:!t,interpolate:linear,radiusRatio:9,scale:linear,setYExtents:!t,shareYAxis:!t,showCircles:!f,smoothLines:!t,times:!(),yAxis:(max:1,min:0)),title:Controversy,type:line))"
   if(req.query.id) {
     req.params.id = req.query.id;
   }
+
+
+  var ip = req.connection.remoteAddress;
+  client.create({
+    index: 'controcurator',
+    type: 'log',
+    id: md5(new Date()+ip+req.originalUrl),
+    body: {
+    'agent'   : ip,
+    'action'  : 'view',
+    'entity'  : 'search',
+    'timestamp' : new Date(),
+    'location'  : req.originalUrl,
+    'data'    : {'search':req.params.id}
+  }
+  });
 
 
   var featuresquery = {

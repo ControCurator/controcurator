@@ -1,129 +1,132 @@
 block annotation
 
 	.sixteen.wide.column
-		.ui.segment(style="border:0px;box-shadow:none;")
-			h2.ui.dividing.header Tell us your perspective on this article
-			p Please read the first two paragraphs of the article and social media comments at the end of the article.
-			p Select the statements below with which you agree:
+		form(method='post',action='')
+			.ui.segment(style="border:0px;box-shadow:none;")
+				h2.ui.dividing.header Tell us your perspective on this article
+				p Please read the first two paragraphs of the article and social media comments at the end of the article.
+				p Select the statements below with which you agree:
 
-			.ui.vertical.segment
-				h5
-					i Many people 
-					| are involved in discussions on the topic of this article
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="a1")
-					label(for="a1") Yes
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="a2")
-					label(for="a2") No
-				.ui.checkbox
-					input(type="checkbox",id="a3")
-					label(for="a3") I am not sure what this means
-				.ui.checkbox
-					input(type="checkbox",id="a4")
-					label(for="a4") I cannot conclude this from the comments of this article
-			
-			.ui.vertical.segment
-				h5
-					| There are 
-					i opposing views 
-					| on the topic of this article
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="b1")
-					label(for="b1") Yes
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="b2")
-					label(for="b2") No
-				.ui.checkbox
-					input(type="checkbox",id="b3")
-					label(for="b3") I am not sure what this means
-				.ui.checkbox
-					input(type="checkbox",id="b4")
-					label(for="b4") I cannot conclude this from the comments of this article
-			
-			.ui.vertical.segment
-				h5
-					| There is 
-					i a public discussion 
-					| on the topic of this article
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="c1")
-					label(for="c1") Yes
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="c2")
-					label(for="c2") No
-				.ui.checkbox
-					input(type="checkbox",id="c3")
-					label(for="c3") I am not sure what this means
-				.ui.checkbox
-					input(type="checkbox",id="c4")
-					label(for="c4") I cannot conclude this from the comments of this article
-			
-			.ui.vertical.segment
-				h5
-					| The discussions on this topic 
-					i is going on for a long time
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="d1")
-					label(for="d1") Yes
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="d2")
-					label(for="d2") No
-				.ui.checkbox
-					input(type="checkbox",id="d3")
-					label(for="d3") I am not sure what this means
-				.ui.checkbox
-					input(type="checkbox",id="d4")
-					label(for="d4") I cannot conclude this from the comments of this article
-			.ui.vertical.segment
-				h5
-					| The topic of this article 
-					i triggers strong emotional responses
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="e1")
-					label(for="e1") Yes
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="e2")
-					label(for="e2") No
-				.ui.checkbox
-					input(type="checkbox",id="e3")
-					label(for="e3") I am not sure what this means
-				.ui.checkbox
-					input(type="checkbox",id="e4")
-					label(for="e4") I cannot conclude this from the comments of this article
+				.ui.vertical.segment
+					h5
+						i Many people 
+						| are involved in discussions on the topic of this article
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="a1",name='actors',value='yes')
+						label(for="a1") Yes
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="a2",name='actors',value='no')
+						label(for="a2") No
+					.ui.checkbox
+						input(type="checkbox",id="a3",name='actors',value='notsure')
+						label(for="a3") I am not sure what this means
+					.ui.checkbox
+						input(type="checkbox",id="a4",name='actors',value='impossible')
+						label(for="a4") I cannot conclude this from the comments of this article
+				
+				.ui.vertical.segment
+					h5
+						| There are 
+						i opposing views 
+						| on the topic of this article
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="b1",name='polarity',value='yes')
+						label(for="b1") Yes
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="b2",name='polarity',value='no')
+						label(for="b2") No
+					.ui.checkbox
+						input(type="checkbox",id="b3",name='polarity',value='notsure')
+						label(for="b3") I am not sure what this means
+					.ui.checkbox
+						input(type="checkbox",id="b4",name='polarity',value='impossible')
+						label(for="b4") I cannot conclude this from the comments of this article
+				
+				.ui.vertical.segment
+					h5
+						| There is 
+						i a public discussion 
+						| on the topic of this article
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="c1",name='openness',value='yes')
+						label(for="c1") Yes
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="c2",name='openness',value='no')
+						label(for="c2") No
+					.ui.checkbox
+						input(type="checkbox",id="c3",name='openness',value='notsure')
+						label(for="c3") I am not sure what this means
+					.ui.checkbox
+						input(type="checkbox",id="c4",name='openness',value='impossible')
+						label(for="c4") I cannot conclude this from the comments of this article
+				
+				.ui.vertical.segment
+					h5
+						| The discussions on this topic 
+						i is going on for a long time
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="d1",name='persistence',value='yes')
+						label(for="d1") Yes
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="d2",name='persistence',value='no')
+						label(for="d2") No
+					.ui.checkbox
+						input(type="checkbox",id="d3",name='persistence',value='notsure')
+						label(for="d3") I am not sure what this means
+					.ui.checkbox
+						input(type="checkbox",id="d4",name='persistence',value='impossible')
+						label(for="d4") I cannot conclude this from the comments of this article
+				.ui.vertical.segment
+					h5
+						| The topic of this article 
+						i triggers strong emotional responses
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="e1",name='emotion',value='yes')
+						label(for="e1") Yes
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="e2",name='emotion',value='no')
+						label(for="e2") No
+					.ui.checkbox
+						input(type="checkbox",id="e3",name='emotion',value='notsure')
+						label(for="e3") I am not sure what this means
+					.ui.checkbox
+						input(type="checkbox",id="e4",name='emotion',value='impossible')
+						label(for="e4") I cannot conclude this from the comments of this article
 
-			.ui.vertical.segment
-				h5 The topic of this article is
-				.centered.ui.buttons
-					button.ui.blue.button Controversial
-					.or
-					button.ui.negative.button Not Controversial
-					.or
-					button.ui.grew.button I don't know
+				.ui.vertical.segment
+					h5 The topic of this article is
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="f1",name='controversy',value='controversial')
+						label(for="f1") Controversial
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="f2",name='controversy',value='notcontroversial')
+						label(for="f2") Not Controversial
+					.ui.checkbox
+						input(type="checkbox",id="f3",name='controversy',value='dontknow')
+						label(for="f3") I dont know
 
+				h3.ui.dividing.header How helpful were the following things for having a better understanding of controversy on this article?
+				.ui.vertical.segment
+					h5 Did the exposure to the controversy help you understand the topic of the article?
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="g1",name='controversyexposure',value='yes')
+						label(for="g1") Yes
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="g2",name='controversyexposure',value='no')
+						label(for="g2") No
+					.ui.checkbox
+						input(type="checkbox",id="g3",name='controversyexposure',value='notsure')
+						label(for="g3") I don't know
+				.ui.vertical.segment
+					h5 Did the exposure to the aspects of controvery help you understand the controversy?
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="h1",name='aspectexposure',value='yes')
+						label(for="h1") Yes
+					.ui.checkbox(style="margin-right:20px;")
+						input(type="checkbox",id="h2",name='aspectexposure',value='no')
+						label(for="h2") No
+					.ui.checkbox
+						input(type="checkbox",id="h3",name='aspectexposure',value='notsure')
+						label(for="h3") I don't know
 
-			h3.ui.dividing.header How helpful were the following things for having a better understanding of controversy on this article?
-			.ui.vertical.segment
-				h5 Did the exposure to the controversy help you understand the topic of the article?
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="g1")
-					label(for="g1") Yes
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="g2")
-					label(for="g2") No
-				.ui.checkbox
-					input(type="checkbox",id="g3")
-					label(for="g3") I don't know
-			.ui.vertical.segment
-				h5 Did the exposure to the aspects of controvery help you understand the controversy?
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="h1")
-					label(for="h1") Yes
-				.ui.checkbox(style="margin-right:20px;")
-					input(type="checkbox",id="h2")
-					label(for="h2") No
-				.ui.checkbox
-					input(type="checkbox",id="h3")
-					label(for="h3") I don't know
-
-			a.ui.primary.right.floated.button.annotate-toggle(style="margin-bottom:40px;") Save
+				input.ui.primary.right.floated.button(type='submit',style="margin-bottom:40px;",value=' Submit ')

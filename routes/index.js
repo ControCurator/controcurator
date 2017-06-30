@@ -9,7 +9,7 @@ var elasticsearch = require('elasticsearch');
 var client = new elasticsearch.Client({
 	host: 'http://controcurator.org/ess'
 });
-
+var md5 = require('md5');
 
 function pagination(c, m) {
 		"use strict";
@@ -29,7 +29,6 @@ function pagination(c, m) {
 				}
 		}  
 		range.push(m);
-		console.log(range);
 		for (i in range) {
 				if (l) {
 						if (range[i] - l === 2) {
@@ -41,13 +40,28 @@ function pagination(c, m) {
 				rangeWithDots.push(range[i]);
 				l = range[i];
 		}
-		console.log(rangeWithDots);
 		return rangeWithDots;
 }
 
 
 
 router.get('/', function(req, res, next) {
+
+		var ip = req.connection.remoteAddress;
+		client.create({
+		  index: 'controcurator',
+		  type: 'log',
+		  id: md5(new Date()+ip+req.originalUrl),
+		  body: {
+			'agent'		: ip,
+			'action' 	: 'view',
+			'entity' 	: 'index',
+			'timestamp'	: new Date(),
+			'location'	: req.originalUrl,
+			'data'		: {}
+		}
+		});
+
 
 
 		var page = req.query.page;

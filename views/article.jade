@@ -37,8 +37,8 @@ block content
 											.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},#{blue})")
 												.progress #{rounded}%
 									.rate.pop(style="float:left;margin-left:20px;", data-variation="small", data-content="Let us know whether this was useful information or not.")
-										i.positive.thumbs.outline.up.icon
-										i.negative.thumbs.outline.down.icon
+										i.positive.thumbs.outline.up.icon.voting(entity='controversy',vote='up')
+										i.negative.thumbs.outline.down.icon.voting(entity='controversy',vote='down')
 
 							tr
 								td.two.wide.column Actors
@@ -55,8 +55,8 @@ block content
 											.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},#{blue})")
 												.progress #{stats.actors}
 									.rate.pop(style="float:left;margin-left:20px;", data-variation="small", data-content="Let us know whether this was useful information or not.")
-										i.positive.thumbs.outline.up.icon
-										i.negative.thumbs.outline.down.icon
+										i.positive.thumbs.outline.up.icon.voting(entity='actors',vote='up')
+										i.negative.thumbs.outline.down.icon.voting(entity='actors',vote='down')
 
 
 							tr
@@ -75,8 +75,8 @@ block content
 											.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},#{blue})")
 												.progress #{view}%
 									.rate.pop(style="float:left;margin-left:20px;", data-variation="small", data-content="Let us know whether this was useful information or not.")
-										i.positive.thumbs.outline.up.icon
-										i.negative.thumbs.outline.down.icon
+										i.positive.thumbs.outline.up.icon.voting(entity='polarity',vote='up')
+										i.negative.thumbs.outline.down.icon.voting(entity='polarity',vote='down')
 
 							tr
 								td.two.wide.column Openness
@@ -95,8 +95,8 @@ block content
 											.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},#{blue})")
 												.progress #{stats.openness}
 									.rate.pop(style="float:left;margin-left:20px;", data-variation="small", data-content="Let us know whether this was useful information or not.")
-										i.positive.thumbs.outline.up.icon
-										i.negative.thumbs.outline.down.icon
+										i.positive.thumbs.outline.up.icon.voting(entity='openness',vote='up')
+										i.negative.thumbs.outline.down.icon.voting(entity='openness',vote='down')
 
 							tr
 								td.two.wide.column Time-Persistence
@@ -115,8 +115,8 @@ block content
 											.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},#{blue})")
 												.progress #{stats.duration} days
 									.rate.pop(style="float:left;margin-left:20px;", data-variation="small", data-content="Let us know whether this was useful information or not.")
-										i.positive.thumbs.outline.up.icon
-										i.negative.thumbs.outline.down.icon
+										i.positive.thumbs.outline.up.icon.voting(entity='persistence',vote='up')
+										i.negative.thumbs.outline.down.icon.voting(entity='persistence',vote='down')
 
 							tr
 								td.two.wide.column Emotion
@@ -132,8 +132,8 @@ block content
 											.bar(style="width:#{rounded}%; background-color: rgb(#{red},#{green},#{blue})")
 												.progress #{view}%
 									.rate.pop(style="float:left;margin-left:20px;", data-variation="small", data-content="Let us know whether this was useful information or not.")
-										i.positive.thumbs.outline.up.icon
-										i.negative.thumbs.outline.down.icon
+										i.positive.thumbs.outline.up.icon.voting(entity='emotion',vote='up')
+										i.negative.thumbs.outline.down.icon.voting(entity='emotion',vote='down')
 
 
 							if article.features.quality
@@ -150,11 +150,13 @@ block content
 
 							if article.features.topics
 								tr
-									td.two.wide.column Topics
+									td.two.wide.column Topic
 									td
-										- each topic in article.features.topics
-											a.ui.tag.label.pop(href='/browse/search/#{topic.name}',style='text-transform: capitalize;', data-title="Explanation", data-variation="small", data-content="The article is about the topic '#{topic.name}' with a confidence of #{topic.value}.") #{topic.name}
-												.detail #{topic.value}
+
+
+										.ui.breadcrumb
+										- each topic in article.features.clusters
+											a.ui.left.pointing.label.pop(href='/browse/search/#{topic.name}',style='text-transform: capitalize;', data-title="Explanation", data-variation="small", data-content="The article is about the topic '#{topic.name}'. The granularity of the related topics is shown with the arrows of the topics.") #{topic.name}
 
 			.ui.sixteen.wide.column
 				.ui.segment
@@ -202,8 +204,8 @@ block content
 
 											.rate(style="position:relative;float:right;")
 												.pop(style="position:absolute;width:45px;right: -5px;bottom: 0px;", data-variation="small", data-content="Let us know whether this was useful information or not.")
-													i.positive.thumbs.outline.up.icon
-													i.negative.thumbs.outline.down.icon
+													i.positive.thumbs.outline.up.icon.voting(entity='comment',vote='up',comment='#{comment.id}')
+													i.negative.thumbs.outline.down.icon.voting(entity='comment',vote='down',comment='#{comment.id}')
 										b
 											!= comment.author
 											| : 
@@ -242,8 +244,8 @@ block content
 													!= sentiment
 											.rate(style="position:relative;float:right;")
 												.pop(style="position:absolute;width:45px;right: -5px;bottom: 0px;", data-variation="small", data-content="Let us know whether this was useful information or not.")
-													i.positive.thumbs.outline.up.icon
-													i.negative.thumbs.outline.down.icon
+													i.positive.thumbs.outline.up.icon.voting(entity='comment',vote='up',comment='#{comment.id}')
+													i.negative.thumbs.outline.down.icon.voting(entity='comment',vote='down',comment='#{comment.id}')
 										b
 											!= comment.author
 											| : 

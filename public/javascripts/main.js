@@ -15,5 +15,16 @@ $(document).ready(function() {
     $('.ui.sidebar').sidebar('setting', 'transition', 'overlay').sidebar('toggle');
   }
   $('.pop').popup();
-
+  $('.voting').on('click', function() {
+    var data = {
+      'entity' : $(this).attr('entity'),
+      'vote' : $(this).attr('vote'),
+      'location' : window.location.pathname
+    }
+    if($(this).attr('comment') !== undefined) {
+      data['comment'] = $(this).attr('comment');
+    }
+    $.post( "/vote/", data );
+    console.log(data);
+ });
 });
