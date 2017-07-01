@@ -1,54 +1,36 @@
 #!/bin/python
+__author__ = 'Kaspar Beelen (k.beelen@uva.nl) and Benjamin Timmermans (b.timmermans@vu.nl)'
 import sys
 import os
 
-
-import random # while real data lacks
+import requests
+import re
 import json
-# KB: Added modules
-import numpy as np
-import pandas as pd
-import random
-
-from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search, Q
-
-
-es = Elasticsearch(
-    ['http://controcurator.org/ess/'],
-    port=80)
-
+from sklearn.externals import joblib
+from sklearn.pipeline import Pipeline
 
 if __name__=='__main__':
+
+
+    stripHTML = lambda x: re.compile('<.*?>').sub('',x)
+
+    path = os.path.dirname(os.path.realpath(__file__))
+
+    pipeline = joblib.load(path+'/controcurator_model_2.pkl')
+
 
     '''
         Given a set of documents, this return the controversy scores
     '''
 
-    if len(sys.argv) > 1:
-        query = sys.argv[1]
-        try:
-            res = es.get(index="controcurator", doc_type="article", id=query)
-            print(json.dumps(res['_source']))
-        except:
-            print(json.dumps({'status':'not_found'}))
-        
-    else:
-        query = {
-                "_source" : {
-                "excludes" : ["comments"]
-                },
-              "query": {
-                "match_all": {}
-              },
-              "sort": [
-                {
-                  "features.controversy.random": "desc"
-                }
-              ]
-            }
-        
-        res = es.search(index="controcurator", doc_type="article", body=query)
-        data = res['hits']['hits']
-        print(json.dumps(data))
+    query = sys.stdin.readlines()[0]
+    query = json.loads(query)
+    texts = [stripHTML(e.get('text',' ')) for e in query]
+    texts = ['\n'.join(texts)]
+
+    controversy = float(pipeline.predict(texts)[0])
+    confidence = float(pipeline.decision_function(texts))
+    #print controversy
+    print({'controversy':controversy, 'confidence':confidence})
+
 
